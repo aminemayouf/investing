@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-09-04 21:14+0200\n"
-"PO-Revision-Date: 2020-09-04 21:15+0200\n"
+"POT-Creation-Date: 2020-09-06 19:08+0200\n"
+"PO-Revision-Date: 2020-09-06 19:08+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -19,12 +19,12 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: fundamental_analysis.py:34
+#: fundamental_analysis.py:36
 msgid "The specified language was not found, the default language will be used"
 msgstr ""
 "La langue spécifiée n'a pas été trouvée, la langue par défaut sera utilisée"
 
-#: fundamental_analysis.py:45
+#: fundamental_analysis.py:47
 msgid ""
 "No keys found, please provide an API key or create an empty file and name it "
 "with the API key and place you key in key(s) under <keys> directory"
@@ -32,116 +32,120 @@ msgstr ""
 "Aucune clé n'a été trouvée, merci de fournir une clé API ou créer un fichier "
 "vide, le nommer avec la clé et le placer sous le répertoire <keys>"
 
-#: fundamental_analysis.py:67
+#: fundamental_analysis.py:69
 msgid "Downloading the company's data..."
 msgstr "Téléchargement des données de l'entreprise..."
 
-#: fundamental_analysis.py:81
+#: fundamental_analysis.py:83
 msgid "The company's data could not be downloaded for the following reason"
 msgstr ""
 "Les données de l'entreprise n'ont pas pu être téléchargées pour la raison "
 "suivante"
 
-#: fundamental_analysis.py:87
+#: fundamental_analysis.py:89
 msgid "Successfuly downloaded the company's data"
 msgstr "Les données de l'entreprise ont été téléchargées avec succès"
 
-#: fundamental_analysis.py:89
+#: fundamental_analysis.py:91
 msgid "Loading cached company's data..."
 msgstr "Chargement des donnée de l'entreprise sauvegardées localement..."
 
-#: fundamental_analysis.py:92
+#: fundamental_analysis.py:94
 msgid "Successfuly loaded cached company's data"
 msgstr ""
 "Les données de l'entreprise sauvegardées localement ont été chargées avec "
 "succès"
 
-#: fundamental_analysis.py:193
+#: fundamental_analysis.py:195
 msgid "Fundamental analysis of"
 msgstr "Analyse fondamentale de"
 
-#: fundamental_analysis.py:198
+#: fundamental_analysis.py:241
+msgid "Change in net income"
+msgstr "Évolution du résultat net"
+
+#: fundamental_analysis.py:247
 msgid "Slater likes smallcaps"
 msgstr "Slater aime les petites capitalisations"
 
-#: fundamental_analysis.py:200
+#: fundamental_analysis.py:249
 msgid "Slater prefers smallcaps"
 msgstr "Slater préfère les petites capitalisations"
 
-#: fundamental_analysis.py:203
+#: fundamental_analysis.py:252
 msgid "Profitability"
 msgstr "Rentabilité"
 
-#: fundamental_analysis.py:210
+#: fundamental_analysis.py:259
 msgid "The gross margin is higher than"
 msgstr "La marge brute est supérieure à"
 
-#: fundamental_analysis.py:212
+#: fundamental_analysis.py:261
 msgid "The gross margin is lower than"
 msgstr "La marge brute est inférieure à"
 
-#: fundamental_analysis.py:213
+#: fundamental_analysis.py:262
 msgid "Gross margin"
 msgstr "Marge brute"
 
-#: fundamental_analysis.py:217
+#: fundamental_analysis.py:266
 msgid "Operating margin"
 msgstr "Marge opérationnelle"
 
-#: fundamental_analysis.py:224
+#: fundamental_analysis.py:273
 msgid "The net margin is higher than"
 msgstr "La marge nette est supérieure à"
 
-#: fundamental_analysis.py:226
+#: fundamental_analysis.py:275
 msgid "The net margin is lower than"
 msgstr "La marge nette est inférieure à"
 
-#: fundamental_analysis.py:227
+#: fundamental_analysis.py:276
 msgid "Net margin"
 msgstr "Marge nette"
 
-#: fundamental_analysis.py:234
+#: fundamental_analysis.py:283
 msgid "Management effectivness"
 msgstr "Efficacité du management"
 
-#: fundamental_analysis.py:237 fundamental_analysis.py:259
-#: fundamental_analysis.py:279 fundamental_analysis.py:298
+#: fundamental_analysis.py:286 fundamental_analysis.py:308
+#: fundamental_analysis.py:328 fundamental_analysis.py:347
 msgid "bad"
 msgstr "mauvais"
 
-#: fundamental_analysis.py:239 fundamental_analysis.py:261
-#: fundamental_analysis.py:273 fundamental_analysis.py:294
+#: fundamental_analysis.py:288 fundamental_analysis.py:310
+#: fundamental_analysis.py:322 fundamental_analysis.py:343
 msgid "good"
 msgstr "bon"
 
-#: fundamental_analysis.py:241 fundamental_analysis.py:250
-#: fundamental_analysis.py:263 fundamental_analysis.py:296
+#: fundamental_analysis.py:290 fundamental_analysis.py:299
+#: fundamental_analysis.py:312 fundamental_analysis.py:345
 msgid "excellent"
 msgstr "excellent"
 
-#: fundamental_analysis.py:252
+#: fundamental_analysis.py:301
 msgid "The return on capital employed is higher than"
 msgstr "Le retour sur capitaux employés est supérieur à"
 
-#: fundamental_analysis.py:254
+#: fundamental_analysis.py:303
 msgid "The return on capital employed is lower than"
 msgstr "Le retour sur capitaux employés est inférieur à"
 
-#: fundamental_analysis.py:267
+#: fundamental_analysis.py:316
 msgid "Balance sheet"
 msgstr "Situation financière"
 
-#: fundamental_analysis.py:275
+#: fundamental_analysis.py:324
 msgid "The current ratio is higher than"
 msgstr "Le ratio de liquidité générale est supérieur à"
 
-#: fundamental_analysis.py:277
+#: fundamental_analysis.py:326
 msgid "However, you should note that the current ratio is higher than"
 msgstr ""
 "Cependant, vous devez noter que le ratio ratio de liquidité générale est "
 "supérieur à"
 
-#: fundamental_analysis.py:277
+#: fundamental_analysis.py:326
 msgid ""
 "which may indicate mismanagement of money due to an inability to collect "
 "payments"
@@ -149,33 +153,33 @@ msgstr ""
 "ce qui peut indiquer une mauvaise gestion de l'argent due à une incapacité à "
 "récupérer les paiements"
 
-#: fundamental_analysis.py:280
+#: fundamental_analysis.py:329
 msgid "The current ratio is lower than"
 msgstr "Le ratio de liquidité générale est inférieur à"
 
-#: fundamental_analysis.py:282
+#: fundamental_analysis.py:331
 msgid "very bad"
 msgstr "très mauvais"
 
-#: fundamental_analysis.py:283
+#: fundamental_analysis.py:332
 msgid "The company must acquire new debt to pay its debt obligations"
 msgstr ""
 "L'entreprise doit acquérir de la dette nouvelle pour payer ses obligations "
 "de dette"
 
-#: fundamental_analysis.py:284
+#: fundamental_analysis.py:333
 msgid "Current ratio"
 msgstr "Ratio de liquidité générale"
 
-#: fundamental_analysis.py:292
+#: fundamental_analysis.py:341
 msgid "The company has good financials, it's QR is higher than"
 msgstr "L'entreprise a une bonne situation financière, son QR est supérieur à"
 
-#: fundamental_analysis.py:299
+#: fundamental_analysis.py:348
 msgid "The company does'nt have good financials, it's QR is lower than"
 msgstr "L'entreprise a une bonne situation financière, son QR est inférieur à"
 
-#: fundamental_analysis.py:307
+#: fundamental_analysis.py:356
 #, python-format
 msgid ""
 "Selling, General and Administrative expenses represent less than 30% of the "
@@ -184,7 +188,7 @@ msgstr ""
 "Les frais de vente, dépenses administratives et autres frais généraux "
 "représentent moins de de 30% de la marge brute"
 
-#: fundamental_analysis.py:309
+#: fundamental_analysis.py:358
 #, python-format
 msgid ""
 "Selling, General and Administrative expenses represent more than 30% of the "
@@ -193,55 +197,55 @@ msgstr ""
 "Les frais de vente, dépenses administratives et autres frais généraux "
 "représentent plus de 30% de la marge brute"
 
-#: fundamental_analysis.py:324
+#: fundamental_analysis.py:373
 msgid "The depreciation is low"
 msgstr "La dépréciation est faible"
 
-#: fundamental_analysis.py:326
+#: fundamental_analysis.py:375
 msgid "The depreciation is high"
 msgstr "La dépréciation est forte"
 
-#: fundamental_analysis.py:334
+#: fundamental_analysis.py:383
 msgid "The interest expense is lower than"
 msgstr "La charge d'intérêts est inférieure à"
 
-#: fundamental_analysis.py:336
+#: fundamental_analysis.py:385
 msgid "The interest expense is higher than"
 msgstr "La charge d'intérêts est supérieure à"
 
-#: fundamental_analysis.py:354
+#: fundamental_analysis.py:403
 msgid "The net earnings follow an upward trend over a period of"
 msgstr "Les résultats nets suivent une tendance haussier sur une période de"
 
-#: fundamental_analysis.py:354 fundamental_analysis.py:356
+#: fundamental_analysis.py:403 fundamental_analysis.py:405
 msgid "years"
 msgstr "ans"
 
-#: fundamental_analysis.py:356
+#: fundamental_analysis.py:405
 msgid "The net earnings follow a downward trend over a period of"
 msgstr "Les résultats nets suivent une tendance baissière sur une période de"
 
-#: fundamental_analysis.py:359
+#: fundamental_analysis.py:408
 msgid "The annual earnings growth rate is higher than"
 msgstr "Le taux de croissance annuel des bénéfices est supérieur à"
 
-#: fundamental_analysis.py:361
+#: fundamental_analysis.py:410
 msgid "The annual earnings growth rate is lower than"
 msgstr "Le taux de croissance annuel des bénéfices est inférieur à"
 
-#: fundamental_analysis.py:372
+#: fundamental_analysis.py:421
 msgid "The company has a significant amount of cash which increases by"
 msgstr "L'entreprise dispose d'une trésorerie importante qui augmente de"
 
-#: fundamental_analysis.py:372
+#: fundamental_analysis.py:421
 msgid "on average per year"
 msgstr "en moyenne par an"
 
-#: fundamental_analysis.py:374
+#: fundamental_analysis.py:423
 msgid "The company draws on it's cash"
 msgstr "L'entreprise puise dans sa trésorerie"
 
-#: fundamental_analysis.py:381
+#: fundamental_analysis.py:430
 msgid ""
 "The company is in a strong position, its long-term debt to net income ratio "
 "is less than"
@@ -249,7 +253,7 @@ msgstr ""
 "L'entreprise est en position de force, son ratio dettes long terme résultats "
 "nets est inférieur à"
 
-#: fundamental_analysis.py:383
+#: fundamental_analysis.py:432
 msgid ""
 "The company is not in a strong position, its long-term debt to net income "
 "ratio is greater than"
@@ -257,11 +261,11 @@ msgstr ""
 "L'entreprise n'est pas en position de force, son ratio dettes long terme "
 "résultats nets est inférieur à"
 
-#: fundamental_analysis.py:398
+#: fundamental_analysis.py:447
 msgid "Inventories move in line with profits"
 msgstr "Les stocks évoluent en ligne avec les bénéfices"
 
-#: fundamental_analysis.py:400
+#: fundamental_analysis.py:449
 msgid ""
 "Inventories do not move in line with profits (to be taken into account only "
 "if the products sold may become obsolete)"
@@ -269,7 +273,7 @@ msgstr ""
 "Les stocks n'évoluent pas en ligne avec les bénéfices (à prendre en compte "
 "seulement si les produits vendus peuvent devenir obsolètes)"
 
-#: fundamental_analysis.py:407
+#: fundamental_analysis.py:456
 msgid ""
 "Tangible fixed assets (PPE) are reasonable: the tangible fixed assets to net "
 "income ratio is less than"
@@ -277,7 +281,7 @@ msgstr ""
 "Les immobilisations corporelles (PPE) sont raisonnables: le ratio "
 "immobilisations corporelles résultats nets est inférieur à"
 
-#: fundamental_analysis.py:409
+#: fundamental_analysis.py:458
 msgid ""
 "The tangible fixed assets (PPE) are not very reasonable: the tangible fixed "
 "assets to net income ratio is greater than"
@@ -285,7 +289,7 @@ msgstr ""
 "Les immobilisations corporelles (PPE) ne sont pas très raisonnables: le "
 "ratio immobilisations corporelles résultats nets est supérieur à"
 
-#: fundamental_analysis.py:423
+#: fundamental_analysis.py:472
 #, python-format
 msgid ""
 "Capital expenditures are reasonable, they represent less than 50% of the net "
@@ -294,7 +298,7 @@ msgstr ""
 "Les dépenses d'investissement sont raisonnables, elles représentent moins de "
 "50% des bénéfices net"
 
-#: fundamental_analysis.py:425
+#: fundamental_analysis.py:474
 #, python-format
 msgid ""
 "Capital expenditures are not very reasonable, they represent more than "
@@ -303,48 +307,44 @@ msgstr ""
 "Les dépenses d'investissement ne sont pas très raisonnables, elles "
 "représentent plus de 50% des bénéfices net"
 
-#: fundamental_analysis.py:429 fundamental_analysis.py:431
-#: fundamental_analysis.py:433 fundamental_analysis.py:439
-#: fundamental_analysis.py:441 fundamental_analysis.py:443
+#: fundamental_analysis.py:478 fundamental_analysis.py:480
+#: fundamental_analysis.py:482 fundamental_analysis.py:488
+#: fundamental_analysis.py:490 fundamental_analysis.py:492
 msgid "The stock value of"
 msgstr "La valeur"
 
-#: fundamental_analysis.py:429
+#: fundamental_analysis.py:478
 msgid "meets some of Warren Buffet's selection criteria"
 msgstr "répond à certains critères de sélection de Warren Buffet"
 
-#: fundamental_analysis.py:431
+#: fundamental_analysis.py:480
 msgid "meets most of Warren Buffet's selection criteria"
 msgstr "répond à la plupart des critères de sélection de Warren Buffet"
 
-#: fundamental_analysis.py:433
+#: fundamental_analysis.py:482
 msgid "does not meet Warren Buffet's selection criteria"
 msgstr "ne répond pas aux critères de sélection de Warren Buffet"
 
-#: fundamental_analysis.py:434 fundamental_analysis.py:444
+#: fundamental_analysis.py:483 fundamental_analysis.py:493
 msgid "Recommendation"
 msgstr "Recommandation"
 
-#: fundamental_analysis.py:435 fundamental_analysis.py:445
+#: fundamental_analysis.py:484 fundamental_analysis.py:494
 msgid "Pros"
 msgstr "Les +"
 
-#: fundamental_analysis.py:436 fundamental_analysis.py:446
+#: fundamental_analysis.py:485 fundamental_analysis.py:495
 msgid "Cons"
 msgstr "Les -"
 
-#: fundamental_analysis.py:439
+#: fundamental_analysis.py:488
 msgid "meets some of Jim Slater's selection criteria"
 msgstr "répond à certains critères de sélection de Jim Slater"
 
-#: fundamental_analysis.py:441
+#: fundamental_analysis.py:490
 msgid "meets most of Jim Slater's selection criteria"
 msgstr "répond à la plupart des critères de sélection de Jim Slater"
 
-#: fundamental_analysis.py:443
+#: fundamental_analysis.py:492
 msgid "does not meet Jim Slater's selection criteria"
 msgstr "ne répond pas aux critères de sélection de Jim Slater"
-
-#: fundamental_analysis.py:453
-msgid "The change in net income"
-msgstr "L'évolution du résultat net"

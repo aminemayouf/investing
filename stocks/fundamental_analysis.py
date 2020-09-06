@@ -5,11 +5,14 @@ import urllib.request
 import requests
 import numpy as np
 import gettext
+from tabulate import tabulate
+from utils.millify import millify
 
 
 def printv(msg):
     if args.verbose:
         print(msg)
+
 
 parser = argparse.ArgumentParser(description='Perform a fundamental analysis of a compagny')
 parser.add_argument('symbol', type=str, help='The company symbol')
@@ -191,6 +194,53 @@ slater_not_approved_summary = ''
 
 print('\n' + _('Fundamental analysis of') + ' {} :\n'.format(company_name))
 
+# predict next year earnings using linear regression
+n = int(np.floor(np.divide(len(earnings), 3)))
+m = len(earnings) - (n * 2)
+
+y1 = 0
+e1 = 0
+for i in range(0, n):
+    y1 += earnings[i]['date']
+    e1 += earnings[i]['earnings']['raw']
+y1 /= n
+e1 /= n
+m1 = (y1, e1)
+
+y2 = 0
+e2 = 0
+for i in range(n, len(earnings) - n):
+    y2 += earnings[i]['date']
+    e2 += earnings[i]['earnings']['raw']
+y2 /= len(earnings) - (n * 2)
+e2 /= len(earnings) - (n * 2)
+m2 = (y2, e2)
+
+y3 = 0
+e3 = 0
+for i in range(len(earnings)-n, len(earnings)):
+    y3 += earnings[i]['date']
+    e3 += earnings[i]['earnings']['raw']
+y3 /= n
+e3 /= n
+m3 = (y3, e3)
+
+p = ((m1[0]+m2[0]+m3[0]) / 3, (m1[1]+m2[1]+m3[1]) / 3)
+
+a = (m3[1]-m1[1])/(m3[0]-m1[0])
+b = p[1] - (a * p[0])
+
+earnings_table_headers = []
+earnings_table = []
+for i in range(len(earnings)):
+        earnings_table_headers.append(earnings[i]['date'])
+        earnings_table.append(earnings[i]['earnings']['fmt'])
+
+earnings_table_headers.append('Est. {}'.format(earnings[-1]['date'] + 1))
+earnings_table.append(millify(a * (earnings[-1]['date'] + 1) + b))
+printv('\n* ' + _('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
+
+# market cap
 slater_criterias += 1
 if market_cap < 5e6:
     slater_approved += 1
