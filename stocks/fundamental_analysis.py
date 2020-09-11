@@ -436,7 +436,7 @@ if len(inventory) > 0:
         if inventory[i] == None:
             continue
         earnings_growth = (1 - (income_statements[len(inventory)-1-i]['netIncome']['raw'] / income_statements[len(inventory)-1-i-1]['netIncome']['raw'])) * 100
-        inventory_growth = (1 - (inventory[i]['reportedValue']['raw'] / inventory[i+1]['reportedValue']['raw'])) * 100
+        inventory_growth = (1 - (inventory[i]['reportedValue']['raw'] / (inventory[i+1]['reportedValue']['raw'] + np.finfo(float).eps))) * 100
         if np.sign(earnings_growth) != np.sign(inventory_growth):
             inline_with_each_other = False
             break
