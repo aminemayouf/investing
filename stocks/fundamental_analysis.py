@@ -108,35 +108,17 @@ revenue = income_statements[0]['totalRevenue']['raw']
 ebit = income_statements[0]['ebit']['raw']
 earnings = income_statements[0]['netIncome']['raw']
 
-trailing_gross_profit = financials['timeSeries']['trailingGrossProfit'][0]['reportedValue']['raw']
-trailing_operating_income = financials['timeSeries']['trailingOperatingIncome'][0]['reportedValue']['raw']
-trailing_net_income = financials['timeSeries']['trailingNetIncome'][0]['reportedValue']['raw']
-
-if len(financials['timeSeries']['trailingInterestExpense']) > 0:
-    interest_expense = financials['timeSeries']['trailingInterestExpense'][0]['reportedValue']['raw']
-elif len(financials['timeSeries']['annualInterestExpense']) > 0:
-    interest_expense = financials['timeSeries']['annualInterestExpense'][-1]['reportedValue']['raw']
-else:
-    interest_expense = None
-    printv('WARNING: Interest expenses value could not be found')
-
-if len(financials['timeSeries']['trailingNetIncome']) > 0:
-    net_income = financials['timeSeries']['trailingNetIncome'][0]['reportedValue']['raw']
-elif len(financials['timeSeries']['annualNetIncome']) > 0:
-    net_income = financials['timeSeries']['annualNetIncome'][-1]['reportedValue']['raw']
-else:
-    net_income = None
-    printv('WARNING: Net income value could not be found')
-
-if len(financials['timeSeries']['trailingSellingGeneralAndAdministration']) > 0:
-    sga = financials['timeSeries']['trailingSellingGeneralAndAdministration'][0]['reportedValue']['raw']
-elif len(financials['timeSeries']['annualSellingGeneralAndAdministration']) > 0:
-    sga = financials['timeSeries']['annualSellingGeneralAndAdministration'][-1]['reportedValue']['raw']
+gross_profit = income_statements[0]['grossProfit']['raw']
+operating_income = income_statements[0]['operatingIncome']['raw']
+net_income = income_statements[0]['netIncome']['raw']
+interest_expense = income_statements[0]['interestExpense']['raw']
+if len(income_statements[0]['sellingGeneralAdministrative']) > 0:
+    sga = income_statements[0]['sellingGeneralAdministrative']['raw']
 else:
     sga = None
-    printv('WARNING: Selling General & Administration value could not be found')
+    printv('WARNING: SG&A value could not be found')
 
-trailing_operating_expense = financials['timeSeries']['trailingOperatingExpense'][0]['reportedValue']['raw']
+operating_expense = income_statements[0]['totalOperatingExpenses']['raw']
 
 annual_ebitda = financials['timeSeries']['annualEbitda']
 ebitda = annual_ebitda[-1]['reportedValue']['raw']
@@ -158,9 +140,8 @@ annual_other_short_term_investments = balance_sheet['timeSeries']['annualOtherSh
 if len(annual_other_short_term_investments) > 0:
     other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments'][-1]['reportedValue']['raw']
 else:
-    other_short_term_investments = 0
+    other_short_term_investments = None
     printv('WARNING: Other short term investments value could not be found')
-
 
 accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable'][-1]['reportedValue']['raw']
 
@@ -253,7 +234,7 @@ else:
 printv(_('Profitability') + ':')
 
 # gross margin
-gross_margin = trailing_gross_profit / revenue * 100
+gross_margin = gross_profit / revenue * 100
 buffet_criterias += 1
 if gross_margin > 40:
     buffet_approved += 1
@@ -263,7 +244,7 @@ else:
 printv(_('Gross margin') + ' (TTM): {:.2f}%'.format(gross_margin))
 
 # operating margin
-operating_margin = trailing_operating_income / revenue * 100
+operating_margin = operating_income / revenue * 100
 printv(_('Operating margin') + ' (TTM): {:.2f}%'.format(operating_margin))
 
 # net margin
@@ -365,14 +346,14 @@ if other_short_term_investments != None:
 
 if sga != None:
     buffet_criterias += 1
-    sga_to_gross_margin_ratio = sga * 100 / trailing_gross_profit
+    sga_to_gross_margin_ratio = sga * 100 / gross_profit
     if sga_to_gross_margin_ratio < 30:
         buffet_approved += 1
         buffet_approved_summary += '\n-' + _('Selling, General and Administrative expenses represent less than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
     else:
         buffet_not_approved_summary += '\n-' + _('Selling, General and Administrative expenses represent more than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
 # else:
-#     operating_expense_to_gross_margin_ratio = trailing_operating_expense * 100 / trailing_gross_profit
+#     operating_expense_to_gross_margin_ratio = operating_expense * 100 / gross_profit
 #     if operating_expense_to_gross_margin_ratio < 70:
 #         buffet_approved += 1
 #         buffet_approved_summary += '\n-Les frais d\'exploitation représentent moins de 70% de la marge brute ({:.2f}%)'.format(operating_expense_to_gross_margin_ratio)
@@ -382,7 +363,7 @@ if sga != None:
 # depretiation to gross margin
 if depreciation != None:
     buffet_criterias += 1
-    depreciation_to_gross_margin_ratio = depreciation * 100 / trailing_gross_profit
+    depreciation_to_gross_margin_ratio = depreciation * 100 / gross_profit
     if depreciation_to_gross_margin_ratio < 15:
         buffet_approved += 1
         buffet_approved_summary += '\n-' + _('The depreciation is low') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
@@ -392,7 +373,7 @@ if depreciation != None:
 # interest expense to operating margin
 if interest_expense != None:
     buffet_criterias += 1
-    interest_expense_to_operating_margin_ratio = interest_expense * 100 / trailing_operating_income
+    interest_expense_to_operating_margin_ratio = interest_expense * 100 / operating_income
     if interest_expense_to_operating_margin_ratio < 15:
         buffet_approved += 1
         buffet_approved_summary += '\n-' + _('The interest expense is lower than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
