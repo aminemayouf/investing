@@ -75,18 +75,22 @@ if update:
         'x-rapidapi-key': apikeys[0]
     }
     response = requests.request("GET", url, headers=headers, params=querystring,)
-    data.append(response.json())
+    if not response:
+        print(_('The company\'s financial data could not be downloaded for the following reason') +': ', response.reason)
+    else:
+        data.append(response.json())
     # fetch company's balance-sheet
     url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-balance-sheet"
     response = requests.request("GET", url, headers=headers, params=querystring,)
     if not response:
-        print(_('The company\'s data could not be downloaded for the following reason') +': ', response.reason)
+        print(_('The company\'s balance-sheet data could not be downloaded for the following reason') +': ', response.reason)
     else:
         data.append(response.json())
-        # store company data as json
+    if data:
+        print(_('Successfuly downloaded the company\'s data'))
+        # store company's data as json
         outfile = open(filename, 'w')
         json.dump(data, outfile, indent=4)
-        print(_('Successfuly downloaded the company\'s data'))
 else:
     print(_('Loading cached company\'s data...'))
     infile = open(filename)
