@@ -8,7 +8,6 @@ import gettext
 from tabulate import tabulate
 from utils.millify import millify
 
-
 def printv(msg):
     if args.verbose:
         print(msg)
@@ -139,6 +138,9 @@ else:
 
 trailing_operating_expense = financials['timeSeries']['trailingOperatingExpense'][0]['reportedValue']['raw']
 
+annual_ebitda = financials['timeSeries']['annualEbitda']
+ebitda = annual_ebitda[-1]['reportedValue']['raw']
+
 balance_sheet = data[1]
 # common_shares = balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['commonStock']['raw']
 # net_income_applicable_to_common_shares = financials['incomeStatementHistory']['incomeStatementHistory'][0]['netIncomeApplicableToCommonShares']['raw']
@@ -159,10 +161,11 @@ else:
     other_short_term_investments = 0
     printv('WARNING: Other short term investments value could not be found')
 
+
 accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable'][-1]['reportedValue']['raw']
 
 # goodwill = balance_sheet['timeSeries']['annualGoodwill'][-1]['reportedValue']['raw']
-# short_term_debt = balance_sheet['timeSeries']['annualCurrentDebt'][-1]['reportedValue']['raw']
+short_term_debt = balance_sheet['timeSeries']['annualCurrentDebt'][-1]['reportedValue']['raw']
 
 cash_flow = financials['cashflowStatementHistory']['cashflowStatements']
 
@@ -272,6 +275,20 @@ if net_margin > 20:
 else:
     buffet_not_approved_summary += '\n-' + _('The net margin is lower than') + ' 20% ({:.2f}%)'.format(net_margin)
 printv(_('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
+
+## overall financial performance
+printv('\n' + _('Overral financial performance') + ':')
+
+# ev / ebitda ratio
+total_debt =  short_term_debt + long_term_debt
+enterprise_value = market_cap + total_debt - cash_and_cash_equivalents
+ev_ebitda_ratio = enterprise_value / ebitda
+comment = _('bad')
+if ev_ebitda_ratio < 11:
+    comment = _('excellent')
+elif ev_ebitda_ratio < 14:
+    comment = _('good')
+printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
 
 # # eps
 # basic_eps = net_income_applicable_to_common_shares / common_shares
@@ -458,8 +475,6 @@ else:
 
 # # goodwill + intangible assets
 # buffet_criterias += 1
-# total_debt =  short_term_debt + long_term_debt
-# enterprise_value = market_cap + total_debt - cash_and_cash_equivalents
 # print('% = {}'.format(((goodwill + intangible_assets) * 100) / enterprise_value))
 
 # capex
