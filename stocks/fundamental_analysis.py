@@ -111,6 +111,7 @@ earnings = income_statements[0]['netIncome']['raw']
 
 trailing_gross_profit = financials['timeSeries']['trailingGrossProfit'][0]['reportedValue']['raw']
 trailing_operating_income = financials['timeSeries']['trailingOperatingIncome'][0]['reportedValue']['raw']
+trailing_net_income = financials['timeSeries']['trailingNetIncome'][0]['reportedValue']['raw']
 
 if len(financials['timeSeries']['trailingInterestExpense']) > 0:
     interest_expense = financials['timeSeries']['trailingInterestExpense'][0]['reportedValue']['raw']
@@ -386,7 +387,7 @@ buffet_criterias += 1
 slater_criterias += 1
 earnings_growth = 0
 consistent_growth = True
-for i in reversed(range(1, len(income_statements))):
+for i in reversed(range(1, len(income_statements)-1)):
     sign = +1
     if income_statements[i-1]['netIncome']['raw'] > income_statements[i]['netIncome']['raw']:
         sign = -1
