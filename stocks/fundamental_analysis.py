@@ -493,3 +493,10 @@ else:
 print('\n' + _('Recommendation') + ' {:.2f}/10'.format(slater_approved * 10 / slater_criterias))
 print(_('Pros') + ': {}'.format(slater_approved_summary))
 print(_('Cons') + ': {}'.format(slater_not_approved_summary))
+
+earnings_table = []
+earnings_table_headers = []
+for i in range(len(earnings)):
+        earnings_table.append(earnings[i]['earnings']['fmt'])
+        earnings_table_headers.append(earnings[i]['date'])
+printv('\n* ' + _('The change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
