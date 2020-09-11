@@ -345,7 +345,7 @@ if other_short_term_investments != None:
             comment = _('excellent')
     else: 
         comment = _('bad')
-        slater_not_approved_summary += '\n-' + _('The company does\'nt have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
+        slater_not_approved_summary += '\n-' + _('The company doesn\'t have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
     printv('QR (TTM): {:.2f} -> {}'.format(quick_ratio, comment))
 
 if sga != None:
@@ -403,7 +403,7 @@ if earnings != None:
         buffet_approved_summary += '\n-' + _('The net earnings follow an upward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(earnings), earnings_growth)
     else:
         buffet_not_approved_summary += '\n-' + _('The net earnings follow a downward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(earnings), earnings_growth)
-    if consistent_growth and earnings_growth > 15:
+    if earnings_growth > 15:
         slater_approved += 1
         slater_approved_summary += '\n-' + _('The annual earnings growth rate is higher than') + ' 15% ({:.2f}%)'.format(earnings_growth)
     else:

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-09-06 19:08+0200\n"
-"PO-Revision-Date: 2020-09-06 19:08+0200\n"
+"POT-Creation-Date: 2020-09-11 09:56+0200\n"
+"PO-Revision-Date: 2020-09-11 09:56+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -176,8 +176,9 @@ msgid "The company has good financials, it's QR is higher than"
 msgstr "L'entreprise a une bonne situation financière, son QR est supérieur à"
 
 #: fundamental_analysis.py:348
-msgid "The company does'nt have good financials, it's QR is lower than"
-msgstr "L'entreprise a une bonne situation financière, son QR est inférieur à"
+msgid "The company doesn't have good financials, it's QR is lower than"
+msgstr ""
+"L'entreprise n'a pas une bonne situation financière, son QR est inférieur à"
 
 #: fundamental_analysis.py:356
 #, python-format
@@ -215,7 +216,7 @@ msgstr "La charge d'intérêts est supérieure à"
 
 #: fundamental_analysis.py:403
 msgid "The net earnings follow an upward trend over a period of"
-msgstr "Les résultats nets suivent une tendance haussier sur une période de"
+msgstr "Les résultats nets suivent une tendance haussière sur une période de"
 
 #: fundamental_analysis.py:403 fundamental_analysis.py:405
 msgid "years"
