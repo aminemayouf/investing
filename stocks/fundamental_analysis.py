@@ -271,6 +271,10 @@ elif ev_ebitda_ratio < 14:
     comment = _('good')
 printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
 
+# ebit / ev multiple
+ebit_ev_multiple = ebit / enterprise_value
+printv('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
+
 # # eps
 # basic_eps = net_income_applicable_to_common_shares / common_shares
 # printv('EPS: {}'.format(basic_eps))
@@ -290,7 +294,7 @@ printv('ROA (TTM): {:.2f}% -> {}'.format(roa, comment))
 slater_criterias += 1
 capital_employed = total_assets - current_liabilities
 roce = ebit / capital_employed * 100
-comment = '-'
+comment = '...'
 if roce > 20:
     comment = _('excellent')
     slater_approved += 1
