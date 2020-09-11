@@ -104,19 +104,10 @@ financials = data[0]
 company_name = financials['quoteType']['longName']
 market_cap = financials['summaryDetail']['marketCap']['raw']
 
-if len(financials['earnings']) > 0:
-    earnings = financials['earnings']['financialsChart']['yearly']
-else:
-    earnings = None
-    printv('WARNING: Financials value could not be found')
-
-if earnings != None:    
-    revenue = earnings[-1]['revenue']['raw']
-else:
-    revenue = None
-    printv('WARNING: Revenue value could not be found')
-
-ebit = financials['incomeStatementHistory']['incomeStatementHistory'][0]['ebit']['raw']
+income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
+revenue = income_statements[0]['totalRevenue']['raw']
+ebit = income_statements[0]['ebit']['raw']
+earnings = income_statements[0]['netIncome']['raw']
 
 trailing_gross_profit = financials['timeSeries']['trailingGrossProfit'][0]['reportedValue']['raw']
 trailing_operating_income = financials['timeSeries']['trailingOperatingIncome'][0]['reportedValue']['raw']
@@ -199,32 +190,34 @@ slater_not_approved_summary = ''
 print('\n' + _('Fundamental analysis of') + ' {} :\n'.format(company_name))
 
 # predict next year earnings using linear regression
-n = int(np.floor(np.divide(len(earnings), 3)))
-m = len(earnings) - (n * 2)
+l = len(income_statements)
+n = int(np.floor(np.divide(l, 3)))
+m = len(income_statements) - (n * 2)
 
 y1 = 0
 e1 = 0
-for i in range(0, n):
-    y1 += earnings[i]['date']
-    e1 += earnings[i]['earnings']['raw']
+for i in reversed(range(0, n)):
+    y1 += int(income_statements[i]['endDate']['fmt'][:4])
+    e1 += income_statements[i]['netIncome']['raw']
 y1 /= n
 e1 /= n
 m1 = (y1, e1)
 
 y2 = 0
 e2 = 0
-for i in range(n, len(earnings) - n):
-    y2 += earnings[i]['date']
-    e2 += earnings[i]['earnings']['raw']
-y2 /= len(earnings) - (n * 2)
-e2 /= len(earnings) - (n * 2)
+for i in reversed(range(n, l - n)):
+    y2 += int(income_statements[i]['endDate']['fmt'][:4])
+    e2 += income_statements[i]['netIncome']['raw']
+y2 /= l - (n * 2)
+e2 /= l - (n * 2)
 m2 = (y2, e2)
 
 y3 = 0
 e3 = 0
-for i in range(len(earnings)-n, len(earnings)):
-    y3 += earnings[i]['date']
-    e3 += earnings[i]['earnings']['raw']
+
+for i in reversed(range(l-n, l)):
+    y3 += int(income_statements[i]['endDate']['fmt'][:4])
+    e3 += income_statements[i]['netIncome']['raw']
 y3 /= n
 e3 /= n
 m3 = (y3, e3)
@@ -236,12 +229,12 @@ b = p[1] - (a * p[0])
 
 earnings_table_headers = []
 earnings_table = []
-for i in range(len(earnings)):
-        earnings_table_headers.append(earnings[i]['date'])
-        earnings_table.append(earnings[i]['earnings']['fmt'])
+for i in reversed(range(l)):
+        earnings_table_headers.append(income_statements[i]['endDate']['fmt'][:4])
+        earnings_table.append(income_statements[i]['netIncome']['fmt'])
 
-earnings_table_headers.append('Est. {}'.format(earnings[-1]['date'] + 1))
-earnings_table.append(millify(a * (earnings[-1]['date'] + 1) + b))
+earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate']['fmt'][:4]) + 1))
+earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
 printv('\n* ' + _('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
 
 # market cap
@@ -389,29 +382,28 @@ if interest_expense != None:
         buffet_not_approved_summary += '\n-' + _('The interest expense is higher than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
     
 # earnings trend
-if earnings != None:
-    buffet_criterias += 1
-    slater_criterias += 1
-    earnings_growth = 0
-    consistent_growth = True
-    for i in range(len(earnings)-1):
-        sign = +1
-        if earnings[i]['earnings']['raw'] > earnings[i+1]['earnings']['raw']:
-            sign = -1
-        earnings_growth += sign * (1 - (earnings[i]['earnings']['raw'] / earnings[i+1]['earnings']['raw'])) * 100
-        if earnings_growth < 15:
-            consistent_growth = False
-    earnings_growth /= len(earnings)
-    if earnings_growth > 0:
-        buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('The net earnings follow an upward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(earnings), earnings_growth)
-    else:
-        buffet_not_approved_summary += '\n-' + _('The net earnings follow a downward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(earnings), earnings_growth)
-    if earnings_growth > 15:
-        slater_approved += 1
-        slater_approved_summary += '\n-' + _('The annual earnings growth rate is higher than') + ' 15% ({:.2f}%)'.format(earnings_growth)
-    else:
-        slater_not_approved_summary += '\n-' + _('The annual earnings growth rate is lower than') + ' 15% ({:.2f}%)'.format(earnings_growth)
+buffet_criterias += 1
+slater_criterias += 1
+earnings_growth = 0
+consistent_growth = True
+for i in reversed(range(1, len(income_statements))):
+    sign = +1
+    if income_statements[i-1]['netIncome']['raw'] > income_statements[i]['netIncome']['raw']:
+        sign = -1
+    earnings_growth += sign * (1 - (income_statements[i-1]['netIncome']['raw'] / income_statements[i]['netIncome']['raw'])) * 100
+    if earnings_growth < 15:
+        consistent_growth = False
+earnings_growth /= len(income_statements)
+if earnings_growth > 0:
+    buffet_approved += 1
+    buffet_approved_summary += '\n-' + _('The net earnings follow an upward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
+else:
+    buffet_not_approved_summary += '\n-' + _('The net earnings follow a downward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
+if earnings_growth > 15:
+    slater_approved += 1
+    slater_approved_summary += '\n-' + _('The annual earnings growth rate is higher than') + ' 15% ({:.2f}%)'.format(earnings_growth)
+else:
+    slater_not_approved_summary += '\n-' + _('The annual earnings growth rate is lower than') + ' 15% ({:.2f}%)'.format(earnings_growth)
     
 # cash and cash equivalents
 buffet_criterias += 1
@@ -437,11 +429,11 @@ else:
 
 # inventory trend
 inventory = balance_sheet['timeSeries']['annualInventory']
-if len(inventory) > 0 and earnings != None:
+if len(inventory) > 0:
     buffet_criterias += 1
     inline_with_each_other = True
     for i in range(len(inventory)-1):
-        earnings_growth = (1 - (earnings[i]['earnings']['raw'] / earnings[i+1]['earnings']['raw'])) * 100
+        earnings_growth = (1 - (income_statements[len(inventory)-1-i]['netIncome']['raw'] / income_statements[len(inventory)-1-i-1]['netIncome']['raw'])) * 100
         inventory_growth = (1 - (inventory[i]['reportedValue']['raw'] / inventory[i+1]['reportedValue']['raw'])) * 100
         if np.sign(earnings_growth) != np.sign(inventory_growth):
             inline_with_each_other = False
