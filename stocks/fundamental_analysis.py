@@ -98,20 +98,40 @@ else:
 
 print('\n')
 
-## exctract infos
+### exctract infos
 financials = data[0]
 company_name = financials['quoteType']['longName']
 market_cap = financials['summaryDetail']['marketCap']['raw']
 
+## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
-revenue = income_statements[0]['totalRevenue']['raw']
+if 'totalRevenue' in income_statements[0]:
+    revenue = income_statements[0]['totalRevenue']['raw']
+else:
+    revenue = None
+    printv('WARNING: Revenue value could not be found')
+
 ebit = income_statements[0]['ebit']['raw']
 earnings = income_statements[0]['netIncome']['raw']
-
+# net_income_applicable_to_common_shares = income_statements[0]['netIncomeApplicableToCommonShares']['raw']
 gross_profit = income_statements[0]['grossProfit']['raw']
 operating_income = income_statements[0]['operatingIncome']['raw']
 net_income = income_statements[0]['netIncome']['raw']
-interest_expense = income_statements[0]['interestExpense']['raw']
+
+# interest expense
+if len(income_statements[0]['interestExpense']) > 0:
+    interest_expense = income_statements[0]['interestExpense']['raw']
+elif len(financials['timeSeries']['annualInterestExpense']) > 0:
+    annual_interest_expense = financials['timeSeries']['annualInterestExpense']
+    if annual_interest_expense[-1]:
+        interest_expense = annual_interest_expense[-1]['reportedValue']['raw']
+    else:
+        interest_expense = None
+        printv('WARNING: Interest expense value could not be found')
+else:
+    interest_expense = None
+    printv('WARNING: Interest expense value could not be found')
+
 if len(income_statements[0]['sellingGeneralAdministrative']) > 0:
     sga = income_statements[0]['sellingGeneralAdministrative']['raw']
 else:
@@ -121,46 +141,84 @@ else:
 operating_expense = income_statements[0]['totalOperatingExpenses']['raw']
 
 annual_ebitda = financials['timeSeries']['annualEbitda']
-ebitda = annual_ebitda[-1]['reportedValue']['raw']
+if len(annual_ebitda) > 0:
+    ebitda = annual_ebitda[-1]['reportedValue']['raw']
+else:
+    ebitda = None
+    printv('WARNING: EBITDA value could not be found')
 
+## balance-sheet
 balance_sheet = data[1]
-# common_shares = balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['commonStock']['raw']
-# net_income_applicable_to_common_shares = financials['incomeStatementHistory']['incomeStatementHistory'][0]['netIncomeApplicableToCommonShares']['raw']
-total_assets = balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['totalAssets']['raw']
-stockholder_equity =  balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['totalStockholderEquity']['raw']
-property_plant_equipment = balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['propertyPlantEquipment']['raw']
-# intangible_assets = balance_sheet['balanceSheetHistory']['balanceSheetStatements'][0]['intangibleAssets']['raw']
-current_assets = balance_sheet['timeSeries']['annualCurrentAssets'][-1]['reportedValue']['raw']
-current_liabilities = balance_sheet['timeSeries']['annualCurrentLiabilities'][-1]['reportedValue']['raw']
-long_term_debt = balance_sheet['timeSeries']['annualLongTermDebt'][-1]['reportedValue']['raw']
+balance_sheet_statements = balance_sheet['balanceSheetHistory']['balanceSheetStatements']
+# common_shares = balance_sheet_statements[0]['commonStock']['raw']
+total_assets = balance_sheet_statements[0]['totalAssets']['raw']
+stockholder_equity =  balance_sheet_statements[0]['totalStockholderEquity']['raw']
+
+if 'propertyPlantEquipment' in balance_sheet_statements[0]:
+    property_plant_equipment = balance_sheet_statements[0]['propertyPlantEquipment']['raw']
+else:
+    property_plant_equipment = None
+    printv('WARNING: Property Plant Equipment value could not be found')
+
+# intangible_assets = balance_sheet_statements[0]['intangibleAssets']['raw']
+current_assets = balance_sheet_statements[0]['totalCurrentAssets']['raw']
+current_liabilities = balance_sheet_statements[0]['totalCurrentLiabilities']['raw']
+
+annual_long_term_debt = balance_sheet['timeSeries']['annualLongTermDebt']
+if len(annual_long_term_debt) > 0 and annual_long_term_debt[-1]:
+    long_term_debt = annual_long_term_debt[-1]['reportedValue']['raw']
+else:
+    long_term_debt = None
+    printv('WARNING: Annual long term debt value could not be found')
+
 annual_cash_and_cash_equivalents = balance_sheet['timeSeries']['annualCashAndCashEquivalents']
-cash_and_cash_equivalents = annual_cash_and_cash_equivalents[-1]['reportedValue']['raw']
+if len(annual_cash_and_cash_equivalents) > 0 and annual_cash_and_cash_equivalents[-1]:
+    cash_and_cash_equivalents = annual_cash_and_cash_equivalents[-1]['reportedValue']['raw']
+else:
+    cash_and_cash_equivalents = None
+    printv('WARNING: Cash and cash equivalents value could not be found')
 
 annual_other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments']
-if len(annual_other_short_term_investments) > 0:
-    other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments'][-1]['reportedValue']['raw']
+if len(annual_other_short_term_investments) > 0 and annual_other_short_term_investments[-1]:
+    other_short_term_investments = annual_other_short_term_investments[-1]['reportedValue']['raw']
 else:
     other_short_term_investments = None
     printv('WARNING: Other short term investments value could not be found')
 
-accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable'][-1]['reportedValue']['raw']
+annual_accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable']
+if len(annual_accounts_receivable) > 0 and annual_accounts_receivable[-1]:
+    accounts_receivable = annual_accounts_receivable[-1]['reportedValue']['raw']
+else:
+    accounts_receivable = None
+    printv('WARNING: Accounts receivable value could not be found')
 
 # goodwill = balance_sheet['timeSeries']['annualGoodwill'][-1]['reportedValue']['raw']
-short_term_debt = balance_sheet['timeSeries']['annualCurrentDebt'][-1]['reportedValue']['raw']
 
+annual_current_debt = balance_sheet['timeSeries']['annualCurrentDebt']
+if len(annual_current_debt) > 0 and annual_current_debt[-1]:
+    short_term_debt = annual_current_debt[-1]['reportedValue']['raw']
+else:
+    short_term_debt = None
+    printv('WARNING: Annual current debt value could not be found')
+
+## cash flow
 cash_flow = financials['cashflowStatementHistory']['cashflowStatements']
 
-capital_expenditures = None
 if 'capitalExpenditures' in cash_flow[0]:
     capital_expenditures = cash_flow[0]['capitalExpenditures']['raw']
 elif 'capitalExpenditures' in cash_flow[1]:
     apital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
+else:
+    capital_expenditures = None
+    printv('WARNING: Capital expenditures value could not be found')
 
-depreciation = None
 if 'depreciation' in cash_flow[0]:
     depreciation = cash_flow[0]['depreciation']['raw']
 elif 'depreciation' in cash_flow[1]:
     depreciation = cash_flow[1]['depreciation']['raw']
+else:
+    depreciation = None
+    printv('WARNING: Depreciation value could not be found')
 
 buffet_approved = 0
 buffet_criterias = 0
@@ -260,20 +318,22 @@ printv(_('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
 ## overall financial performance
 printv('\n' + _('Overral financial performance') + ':')
 
-# ev / ebitda ratio
-total_debt =  short_term_debt + long_term_debt
-enterprise_value = market_cap + total_debt - cash_and_cash_equivalents
-ev_ebitda_ratio = enterprise_value / ebitda
-comment = _('bad')
-if ev_ebitda_ratio < 11:
-    comment = _('excellent')
-elif ev_ebitda_ratio < 14:
-    comment = _('good')
-printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
+if short_term_debt and long_term_debt:
+    # ev / ebitda ratio
+    if cash_and_cash_equivalents and ebitda:
+        total_debt =  short_term_debt + long_term_debt
+        enterprise_value = market_cap + total_debt - cash_and_cash_equivalents
+        ev_ebitda_ratio = enterprise_value / ebitda
+        comment = _('bad')
+        if ev_ebitda_ratio < 11:
+            comment = _('excellent')
+        elif ev_ebitda_ratio < 14:
+            comment = _('good')
+        printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
 
-# ebit / ev multiple
-ebit_ev_multiple = ebit / enterprise_value
-printv('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
+    # ebit / ev multiple
+    ebit_ev_multiple = ebit / enterprise_value
+    printv('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
 
 # # eps
 # basic_eps = net_income_applicable_to_common_shares / common_shares
@@ -333,7 +393,7 @@ else:
 printv(_('Current ratio') + ' (TTM): {:.2f} -> {}'.format(current_ratio, comment))
 
 # quick ratio
-if other_short_term_investments != None:
+if other_short_term_investments and accounts_receivable and cash_and_cash_equivalents:
     slater_criterias += 1
     quick_ratio = (cash_and_cash_equivalents + other_short_term_investments + accounts_receivable) / current_liabilities
     if quick_ratio > 1:
@@ -348,7 +408,7 @@ if other_short_term_investments != None:
         slater_not_approved_summary += '\n-' + _('The company doesn\'t have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
     printv('QR (TTM): {:.2f} -> {}'.format(quick_ratio, comment))
 
-if sga != None:
+if sga:
     buffet_criterias += 1
     sga_to_gross_margin_ratio = sga * 100 / gross_profit
     if sga_to_gross_margin_ratio < 30:
@@ -365,7 +425,7 @@ if sga != None:
 #         buffet_not_approved_summary += '\n-Les frais d\'exploitation représentent plus de 70% de la marge brute ({:.2f}%)'.format(operating_expense_to_gross_margin_ratio)
 
 # depretiation to gross margin
-if depreciation != None:
+if depreciation:
     buffet_criterias += 1
     depreciation_to_gross_margin_ratio = depreciation * 100 / gross_profit
     if depreciation_to_gross_margin_ratio < 15:
@@ -375,7 +435,7 @@ if depreciation != None:
         buffet_not_approved_summary += '\n-' + _('The depreciation is high') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
 
 # interest expense to operating margin
-if interest_expense != None:
+if interest_expense:
     buffet_criterias += 1
     interest_expense_to_operating_margin_ratio = interest_expense * 100 / operating_income
     if interest_expense_to_operating_margin_ratio < 15:
@@ -450,20 +510,21 @@ if len(inventory) > 0:
         buffet_not_approved_summary += '\n-' + _('Inventories do not move in line with profits (to be taken into account only if the products sold may become obsolete)')
 
 # ppe
-buffet_criterias += 1
-property_to_net_income_ratio = property_plant_equipment / net_income
-if property_to_net_income_ratio < 2:
-    buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('Tangible fixed assets (PPE) are reasonable: the tangible fixed assets to net income ratio is less than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
-else:
-    buffet_not_approved_summary += '\n-' + _('The tangible fixed assets (PPE) are not very reasonable: the tangible fixed assets to net income ratio is greater than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
+if property_plant_equipment:
+    buffet_criterias += 1
+    property_to_net_income_ratio = property_plant_equipment / net_income
+    if property_to_net_income_ratio < 2:
+        buffet_approved += 1
+        buffet_approved_summary += '\n-' + _('Tangible fixed assets (PPE) are reasonable: the tangible fixed assets to net income ratio is less than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
+    else:
+        buffet_not_approved_summary += '\n-' + _('The tangible fixed assets (PPE) are not very reasonable: the tangible fixed assets to net income ratio is greater than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
 
 # # goodwill + intangible assets
 # buffet_criterias += 1
 # print('% = {}'.format(((goodwill + intangible_assets) * 100) / enterprise_value))
 
 # capex
-if capital_expenditures != None:
+if capital_expenditures:
     buffet_criterias += 1
     capital_expenditures_to_profit_ratio = np.abs(capital_expenditures, dtype=np.int64) * 100 / net_income
     if capital_expenditures_to_profit_ratio < 50:
