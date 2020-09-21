@@ -168,8 +168,11 @@ annual_long_term_debt = balance_sheet['timeSeries']['annualLongTermDebt']
 if len(annual_long_term_debt) > 0 and annual_long_term_debt[-1]:
     long_term_debt = annual_long_term_debt[-1]['reportedValue']['raw']
 else:
-    long_term_debt = None
-    printv('WARNING: Annual long term debt value could not be found')
+    if 'longTermDebt' in balance_sheet_statements[0]:
+        long_term_debt = balance_sheet_statements[0]['longTermDebt']['raw']
+    else:
+        long_term_debt = None
+        printv('WARNING: Annual long term debt value could not be found')
 
 annual_cash_and_cash_equivalents = balance_sheet['timeSeries']['annualCashAndCashEquivalents']
 if len(annual_cash_and_cash_equivalents) > 0 and annual_cash_and_cash_equivalents[-1]:
@@ -482,13 +485,14 @@ else:
     buffet_not_approved_summary += '\n-' + _('The company draws on it\'s cash')
 
 # little to no debt
-buffet_criterias += 1
-long_term_debt_to_net_income_ratio = long_term_debt / net_income
-if long_term_debt_to_net_income_ratio < 4:
-    buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('The company is in a strong position, its long-term debt to net income ratio is less than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
-else:
-    buffet_not_approved_summary += '\n-' + _('The company is not in a strong position, its long-term debt to net income ratio is greater than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
+if long_term_debt:
+    buffet_criterias += 1
+    long_term_debt_to_net_income_ratio = long_term_debt / net_income
+    if long_term_debt_to_net_income_ratio < 4:
+        buffet_approved += 1
+        buffet_approved_summary += '\n-' + _('The company is in a strong position, its long-term debt to net income ratio is less than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
+    else:
+        buffet_not_approved_summary += '\n-' + _('The company is not in a strong position, its long-term debt to net income ratio is greater than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
 
 # inventory trend
 inventory = balance_sheet['timeSeries']['annualInventory']
