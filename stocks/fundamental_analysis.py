@@ -7,6 +7,7 @@ import numpy as np
 import gettext
 from tabulate import tabulate
 from utils.millify import millify
+from utils.scrappers.investing_dot_com import equities
 
 
 def printv(msg):
@@ -105,8 +106,7 @@ company_name = financials['quoteType']['longName']
 if len(financials['summaryDetail']['marketCap']) > 0:
     market_cap = financials['summaryDetail']['marketCap']['raw']
 else:
-    market_cap = None
-    printv('WARNING: Market cap value could not be found')
+    market_cap = equities.balance_sheet(symbol).total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
