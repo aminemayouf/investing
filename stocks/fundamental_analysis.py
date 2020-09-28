@@ -8,6 +8,7 @@ import gettext
 from tabulate import tabulate
 from utils.millify import millify
 
+
 def printv(msg):
     if args.verbose:
         print(msg)
@@ -101,7 +102,11 @@ print('\n')
 ### exctract infos
 financials = data[0]
 company_name = financials['quoteType']['longName']
-market_cap = financials['summaryDetail']['marketCap']['raw']
+if len(financials['summaryDetail']['marketCap']) > 0:
+    market_cap = financials['summaryDetail']['marketCap']['raw']
+else:
+    market_cap = None
+    printv('WARNING: Market cap value could not be found')
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
@@ -210,7 +215,7 @@ cash_flow = financials['cashflowStatementHistory']['cashflowStatements']
 if 'capitalExpenditures' in cash_flow[0]:
     capital_expenditures = cash_flow[0]['capitalExpenditures']['raw']
 elif 'capitalExpenditures' in cash_flow[1]:
-    apital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
+    capital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
 else:
     capital_expenditures = None
     printv('WARNING: Capital expenditures value could not be found')
@@ -283,13 +288,14 @@ earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate
 earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
 printv('\n* ' + _('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
 
-# market cap
-slater_criterias += 1
-if market_cap < 5e6:
-    slater_approved += 1
-    slater_approved_summary += '\n-' + _('Slater likes smallcaps')
-else:
-    slater_not_approved_summary += '\n-' + _('Slater prefers smallcaps')
+## market cap
+if market_cap:
+    slater_criterias += 1
+    if market_cap > 300e6 and market_cap < 2e9:
+        slater_approved += 1
+        slater_approved_summary += '\n-' + _('Slater likes smallcaps')
+    else:
+        slater_not_approved_summary += '\n-' + _('Slater prefers smallcaps')
 
 ## profitability
 printv(_('Profitability') + ':')
@@ -321,7 +327,7 @@ printv(_('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
 ## overall financial performance
 printv('\n' + _('Overral financial performance') + ':')
 
-if short_term_debt and long_term_debt:
+if short_term_debt and long_term_debt and market_cap:
     # ev / ebitda ratio
     if cash_and_cash_equivalents and ebitda:
         total_debt =  short_term_debt + long_term_debt
