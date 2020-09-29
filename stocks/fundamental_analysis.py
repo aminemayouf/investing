@@ -4,9 +4,9 @@ import os
 import urllib.request
 import requests
 import numpy as np
-import gettext
 from tabulate import tabulate
 from utils.millify import millify
+from utils.translate import Translator
 from utils.scrappers.investing_dot_com import equities
 from utils.scrappers.yahoo_finance import apikeys
 
@@ -27,14 +27,8 @@ parser.add_argument('-v', '--verbose', action='store_true', default=False,
 
 args = parser.parse_args()
 
-_ = gettext.gettext
-if not args.locale == 'en':    
-    if args.locale == 'fr':
-        fr = gettext.translation('fr_FR', localedir='locales', languages=['fr'])
-        fr.install()
-        _ = fr.gettext
-    else:
-        print(_('The specified language was not found, the default language will be used'))
+# get translator
+tr = Translator(args.locale)
 
 # fetch api key(s)
 keys = []
@@ -43,7 +37,7 @@ if args.apikey:
 else:
     keys = apikeys.load()
     if not keys:
-        print(_('No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory'))
+        print(tr('No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory'))
         exit(0)
 
 # update cache
@@ -65,7 +59,7 @@ if not os.path.exists(filename):
 data = []
 if update:
     # fetch company's data
-    print(_('Downloading the company\'s data...'))
+    print(tr('Downloading the company\'s data...'))
     # fetch company's financials
     url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-financials"
     querystring = {"symbol": symbol}
@@ -75,26 +69,26 @@ if update:
     }
     response = requests.request("GET", url, headers=headers, params=querystring,)
     if not response:
-        print(_('The company\'s financial data could not be downloaded for the following reason') +': ', response.reason)
+        print(tr('The company\'s financial data could not be downloaded for the following reason') +': ', response.reason)
     else:
         data.append(response.json())
     # fetch company's balance-sheet
     url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-balance-sheet"
     response = requests.request("GET", url, headers=headers, params=querystring,)
     if not response:
-        print(_('The company\'s balance-sheet data could not be downloaded for the following reason') +': ', response.reason)
+        print(tr('The company\'s balance-sheet data could not be downloaded for the following reason') +': ', response.reason)
     else:
         data.append(response.json())
     if data:
-        print(_('Successfuly downloaded the company\'s data'))
+        print(tr('Successfuly downloaded the company\'s data'))
         # store company's data as json
         outfile = open(filename, 'w')
         json.dump(data, outfile, indent=4)
 else:
-    print(_('Loading cached company\'s data...'))
+    print(tr('Loading cached company\'s data...'))
     infile = open(filename)
     data = json.load(infile)
-    print(_('Successfuly loaded cached company\'s data'))
+    print(tr('Successfuly loaded cached company\'s data'))
 
 print('\n')
 
@@ -236,7 +230,7 @@ slater_criterias = 0
 slater_approved_summary = ''
 slater_not_approved_summary = ''
 
-print('\n' + _('Fundamental analysis of') + ' {} :\n'.format(company_name))
+print('\n' + tr('Fundamental analysis of') + ' {} :\n'.format(company_name))
 
 # predict next year earnings using linear regression
 l = len(income_statements)
@@ -284,46 +278,46 @@ for i in reversed(range(l)):
 
 earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate']['fmt'][:4]) + 1))
 earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
-printv('\n* ' + _('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
+printv('\n* ' + tr('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
 
 ## market cap
 if market_cap:
     slater_criterias += 1
     if market_cap > 300e6 and market_cap < 2e9:
         slater_approved += 1
-        slater_approved_summary += '\n-' + _('Slater likes smallcaps')
+        slater_approved_summary += '\n-' + tr('Slater likes smallcaps')
     else:
-        slater_not_approved_summary += '\n-' + _('Slater prefers smallcaps')
+        slater_not_approved_summary += '\n-' + tr('Slater prefers smallcaps')
 
 ## profitability
-printv(_('Profitability') + ':')
+printv(tr('Profitability') + ':')
 
 # gross margin
 gross_margin = gross_profit / revenue * 100
 buffet_criterias += 1
 if gross_margin > 40:
     buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('The gross margin is higher than') + ' 40% ({:.2f}%)'.format(gross_margin)
+    buffet_approved_summary += '\n-' + tr('The gross margin is higher than') + ' 40% ({:.2f}%)'.format(gross_margin)
 else:
-    buffet_not_approved_summary += '\n-' + _('The gross margin is lower than') + ' 40% ({:.2f}%)'.format(gross_margin)
-printv(_('Gross margin') + ' (TTM): {:.2f}%'.format(gross_margin))
+    buffet_not_approved_summary += '\n-' + tr('The gross margin is lower than') + ' 40% ({:.2f}%)'.format(gross_margin)
+printv(tr('Gross margin') + ' (TTM): {:.2f}%'.format(gross_margin))
 
 # operating margin
 operating_margin = operating_income / revenue * 100
-printv(_('Operating margin') + ' (TTM): {:.2f}%'.format(operating_margin))
+printv(tr('Operating margin') + ' (TTM): {:.2f}%'.format(operating_margin))
 
 # net margin
 net_margin = net_income / revenue * 100
 buffet_criterias += 1
 if net_margin > 20:
     buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('The net margin is higher than') + ' 20% ({:.2f}%)'.format(net_margin)
+    buffet_approved_summary += '\n-' + tr('The net margin is higher than') + ' 20% ({:.2f}%)'.format(net_margin)
 else:
-    buffet_not_approved_summary += '\n-' + _('The net margin is lower than') + ' 20% ({:.2f}%)'.format(net_margin)
-printv(_('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
+    buffet_not_approved_summary += '\n-' + tr('The net margin is lower than') + ' 20% ({:.2f}%)'.format(net_margin)
+printv(tr('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
 
 ## overall financial performance
-printv('\n' + _('Overral financial performance') + ':')
+printv('\n' + tr('Overral financial performance') + ':')
 
 if short_term_debt and long_term_debt and market_cap:
     # ev / ebitda ratio
@@ -331,11 +325,11 @@ if short_term_debt and long_term_debt and market_cap:
         total_debt =  short_term_debt + long_term_debt
         enterprise_value = market_cap + total_debt - cash_and_cash_equivalents
         ev_ebitda_ratio = enterprise_value / ebitda
-        comment = _('bad')
+        comment = tr('bad')
         if ev_ebitda_ratio < 11:
-            comment = _('excellent')
+            comment = tr('excellent')
         elif ev_ebitda_ratio < 14:
-            comment = _('good')
+            comment = tr('good')
         printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
 
     # ebit / ev multiple
@@ -347,14 +341,14 @@ if short_term_debt and long_term_debt and market_cap:
 # printv('EPS: {}'.format(basic_eps))
 
 ## management effectivness
-printv('\n' + _('Management effectivness') + ':')
+printv('\n' + tr('Management effectivness') + ':')
 # roa
 roa = net_income / total_assets * 100
-comment = _('bad')
+comment = tr('bad')
 if roa > 5:
-    comment = _('good')
+    comment = tr('good')
 if roa > 10:
-    comment = _('excellent')
+    comment = tr('excellent')
 printv('ROA (TTM): {:.2f}% -> {}'.format(roa, comment))
 
 # roce (return on capital employed)
@@ -363,41 +357,41 @@ capital_employed = total_assets - current_liabilities
 roce = ebit / capital_employed * 100
 comment = '...'
 if roce > 20:
-    comment = _('excellent')
+    comment = tr('excellent')
     slater_approved += 1
-    slater_approved_summary += '\n-' + _('The return on capital employed is higher than') + ' 20% ({:.2f}%)'.format(roce)
+    slater_approved_summary += '\n-' + tr('The return on capital employed is higher than') + ' 20% ({:.2f}%)'.format(roce)
 else:
-    slater_not_approved_summary += '\n-' + _('The return on capital employed is lower than') + ' 20% ({:.2f}%)'.format(roce)
+    slater_not_approved_summary += '\n-' + tr('The return on capital employed is lower than') + ' 20% ({:.2f}%)'.format(roce)
 printv('ROCE (TTM): {:.2f}% -> {}'.format(roce, comment))
 
 # roe
 roe = net_income / stockholder_equity * 100
-comment = _('bad')
+comment = tr('bad')
 if roe >= 15 and roe <= 20:
-    comment = _('good')
+    comment = tr('good')
 elif roe > 20:
-    comment = _('excellent')
+    comment = tr('excellent')
 printv('ROE (TTM): {:.2f}% -> {}'.format(roe, comment))
 
 ## balance sheet
-printv('\n' + _('Balance sheet') + ':')
+printv('\n' + tr('Balance sheet') + ':')
 
 # current ratio
 buffet_criterias += 1
 current_ratio = current_assets / current_liabilities
 if current_ratio > 1.5:
-    comment = _('good')
+    comment = tr('good')
     buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('The current ratio is higher than') + ' 1.5 ({:.2f})'.format(current_ratio)
+    buffet_approved_summary += '\n-' + tr('The current ratio is higher than') + ' 1.5 ({:.2f})'.format(current_ratio)
     if (current_ratio > 2.5):
-        buffet_approved_summary += '\n-' + _('However, you should note that the current ratio is higher than') + ' 2.5, ' + _('which may indicate mismanagement of money due to an inability to collect payments')
+        buffet_approved_summary += '\n-' + tr('However, you should note that the current ratio is higher than') + ' 2.5, ' + tr('which may indicate mismanagement of money due to an inability to collect payments')
 else:
-    comment = _('bad')
-    buffet_not_approved_summary += '\n-' + _('The current ratio is lower than') + ' 1.5 ({:.2f})'.format(current_ratio)
+    comment = tr('bad')
+    buffet_not_approved_summary += '\n-' + tr('The current ratio is lower than') + ' 1.5 ({:.2f})'.format(current_ratio)
     if current_ratio < 1:
-        comment = _('very bad')
-        buffet_not_approved_summary += '\n-' + _('The company must acquire new debt to pay its debt obligations')
-printv(_('Current ratio') + ' (TTM): {:.2f} -> {}'.format(current_ratio, comment))
+        comment = tr('very bad')
+        buffet_not_approved_summary += '\n-' + tr('The company must acquire new debt to pay its debt obligations')
+printv(tr('Current ratio') + ' (TTM): {:.2f} -> {}'.format(current_ratio, comment))
 
 # quick ratio
 if other_short_term_investments and accounts_receivable and cash_and_cash_equivalents:
@@ -405,14 +399,14 @@ if other_short_term_investments and accounts_receivable and cash_and_cash_equiva
     quick_ratio = (cash_and_cash_equivalents + other_short_term_investments + accounts_receivable) / current_liabilities
     if quick_ratio > 1:
         slater_approved += 1
-        slater_approved_summary += '\n-' + _('The company has good financials, it\'s QR is higher than') + ' 1 ({:.2f})'.format(quick_ratio)
+        slater_approved_summary += '\n-' + tr('The company has good financials, it\'s QR is higher than') + ' 1 ({:.2f})'.format(quick_ratio)
         if quick_ratio <= 1.5:
-            comment = _('good')
+            comment = tr('good')
         elif quick_ratio > 1.5:
-            comment = _('excellent')
+            comment = tr('excellent')
     else: 
-        comment = _('bad')
-        slater_not_approved_summary += '\n-' + _('The company doesn\'t have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
+        comment = tr('bad')
+        slater_not_approved_summary += '\n-' + tr('The company doesn\'t have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
     printv('QR (TTM): {:.2f} -> {}'.format(quick_ratio, comment))
 
 if sga:
@@ -420,9 +414,9 @@ if sga:
     sga_to_gross_margin_ratio = sga * 100 / gross_profit
     if sga_to_gross_margin_ratio < 30:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('Selling, General and Administrative expenses represent less than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
+        buffet_approved_summary += '\n-' + tr('Selling, General and Administrative expenses represent less than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('Selling, General and Administrative expenses represent more than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
+        buffet_not_approved_summary += '\n-' + tr('Selling, General and Administrative expenses represent more than 30% of the gross margin') + ' ({:.2f}%)'.format(sga_to_gross_margin_ratio)
 # else:
 #     operating_expense_to_gross_margin_ratio = operating_expense * 100 / gross_profit
 #     if operating_expense_to_gross_margin_ratio < 70:
@@ -437,9 +431,9 @@ if depreciation:
     depreciation_to_gross_margin_ratio = depreciation * 100 / gross_profit
     if depreciation_to_gross_margin_ratio < 15:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('The depreciation is low') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
+        buffet_approved_summary += '\n-' + tr('The depreciation is low') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('The depreciation is high') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
+        buffet_not_approved_summary += '\n-' + tr('The depreciation is high') + ' ({:.2f}%)'.format(depreciation_to_gross_margin_ratio)
 
 # interest expense to operating margin
 if interest_expense:
@@ -447,9 +441,9 @@ if interest_expense:
     interest_expense_to_operating_margin_ratio = interest_expense * 100 / operating_income
     if interest_expense_to_operating_margin_ratio < 15:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('The interest expense is lower than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
+        buffet_approved_summary += '\n-' + tr('The interest expense is lower than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('The interest expense is higher than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
+        buffet_not_approved_summary += '\n-' + tr('The interest expense is higher than') + ' 15% ({:.2f}%)'.format(interest_expense_to_operating_margin_ratio)
     
 # earnings trend
 buffet_criterias += 1
@@ -466,14 +460,14 @@ for i in reversed(range(1, len(income_statements)-1)):
 earnings_growth /= len(income_statements)
 if earnings_growth > 0:
     buffet_approved += 1
-    buffet_approved_summary += '\n-' + _('The net earnings follow an upward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
+    buffet_approved_summary += '\n-' + tr('The net earnings follow an upward trend over a period of') + (' {} ' + tr('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
 else:
-    buffet_not_approved_summary += '\n-' + _('The net earnings follow a downward trend over a period of') + (' {} ' + _('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
+    buffet_not_approved_summary += '\n-' + tr('The net earnings follow a downward trend over a period of') + (' {} ' + tr('years') + ' ({:.2f}%)').format(len(income_statements), earnings_growth)
 if earnings_growth > 15:
     slater_approved += 1
-    slater_approved_summary += '\n-' + _('The annual earnings growth rate is higher than') + ' 15% ({:.2f}%)'.format(earnings_growth)
+    slater_approved_summary += '\n-' + tr('The annual earnings growth rate is higher than') + ' 15% ({:.2f}%)'.format(earnings_growth)
 else:
-    slater_not_approved_summary += '\n-' + _('The annual earnings growth rate is lower than') + ' 15% ({:.2f}%)'.format(earnings_growth)
+    slater_not_approved_summary += '\n-' + tr('The annual earnings growth rate is lower than') + ' 15% ({:.2f}%)'.format(earnings_growth)
     
 # cash and cash equivalents
 buffet_criterias += 1
@@ -484,9 +478,9 @@ for i in range(len(annual_cash_and_cash_equivalents)-1):
 if cash_growth > 0:
     buffet_approved += 1
     # todo: check if it's generated by free cash flow
-    buffet_approved_summary += '\n-' + _('The company has a significant amount of cash which increases by') + ' {:.2f}% '.format(cash_growth) + _('on average per year')
+    buffet_approved_summary += '\n-' + tr('The company has a significant amount of cash which increases by') + ' {:.2f}% '.format(cash_growth) + tr('on average per year')
 else:
-    buffet_not_approved_summary += '\n-' + _('The company draws on it\'s cash')
+    buffet_not_approved_summary += '\n-' + tr('The company draws on it\'s cash')
 
 # little to no debt
 if long_term_debt:
@@ -494,9 +488,9 @@ if long_term_debt:
     long_term_debt_to_net_income_ratio = long_term_debt / net_income
     if long_term_debt_to_net_income_ratio < 4:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('The company is in a strong position, its long-term debt to net income ratio is less than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
+        buffet_approved_summary += '\n-' + tr('The company is in a strong position, its long-term debt to net income ratio is less than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('The company is not in a strong position, its long-term debt to net income ratio is greater than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
+        buffet_not_approved_summary += '\n-' + tr('The company is not in a strong position, its long-term debt to net income ratio is greater than') + ' 4 ({:.2f})'.format(long_term_debt_to_net_income_ratio)
 
 # inventory trend
 inventory = balance_sheet['timeSeries']['annualInventory']
@@ -513,9 +507,9 @@ if len(inventory) > 0:
             break
     if inline_with_each_other:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('Inventories move in line with profits')
+        buffet_approved_summary += '\n-' + tr('Inventories move in line with profits')
     else:
-        buffet_not_approved_summary += '\n-' + _('Inventories do not move in line with profits (to be taken into account only if the products sold may become obsolete)')
+        buffet_not_approved_summary += '\n-' + tr('Inventories do not move in line with profits (to be taken into account only if the products sold may become obsolete)')
 
 # ppe
 if property_plant_equipment:
@@ -523,9 +517,9 @@ if property_plant_equipment:
     property_to_net_income_ratio = property_plant_equipment / net_income
     if property_to_net_income_ratio < 2:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('Tangible fixed assets (PPE) are reasonable: the tangible fixed assets to net income ratio is less than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
+        buffet_approved_summary += '\n-' + tr('Tangible fixed assets (PPE) are reasonable: the tangible fixed assets to net income ratio is less than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('The tangible fixed assets (PPE) are not very reasonable: the tangible fixed assets to net income ratio is greater than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
+        buffet_not_approved_summary += '\n-' + tr('The tangible fixed assets (PPE) are not very reasonable: the tangible fixed assets to net income ratio is greater than') + ' 2 ({:.2f})'.format(property_to_net_income_ratio)
 
 # # goodwill + intangible assets
 # buffet_criterias += 1
@@ -537,27 +531,27 @@ if capital_expenditures:
     capital_expenditures_to_profit_ratio = np.abs(capital_expenditures, dtype=np.int64) * 100 / net_income
     if capital_expenditures_to_profit_ratio < 50:
         buffet_approved += 1
-        buffet_approved_summary += '\n-' + _('Capital expenditures are reasonable, they represent less than 50% of the net income') + ' ({:.2f}%)'.format(capital_expenditures_to_profit_ratio)
+        buffet_approved_summary += '\n-' + tr('Capital expenditures are reasonable, they represent less than 50% of the net income') + ' ({:.2f}%)'.format(capital_expenditures_to_profit_ratio)
     else:
-        buffet_not_approved_summary += '\n-' + _('Capital expenditures are not very reasonable, they represent more than 50% of the net income') + ' ({:.2f}%)'.format(capital_expenditures_to_profit_ratio)
+        buffet_not_approved_summary += '\n-' + tr('Capital expenditures are not very reasonable, they represent more than 50% of the net income') + ' ({:.2f}%)'.format(capital_expenditures_to_profit_ratio)
 
 # results
 if buffet_approved / buffet_criterias >= 0.5 and buffet_approved / buffet_criterias <= 0.7:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('meets some of Warren Buffet\'s selection criteria'))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('meets some of Warren Buffet\'s selection criteria'))
 elif buffet_approved / buffet_criterias > 0.7:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('meets most of Warren Buffet\'s selection criteria'))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('meets most of Warren Buffet\'s selection criteria'))
 else:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('does not meet Warren Buffet\'s selection criteria'))
-print('\n' + _('Recommendation') + ' {:.2f}/10'.format(buffet_approved * 10 / buffet_criterias))
-print(_('Pros') + ': {}'.format(buffet_approved_summary))
-print(_('Cons') + ': {}'.format(buffet_not_approved_summary))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('does not meet Warren Buffet\'s selection criteria'))
+print('\n' + tr('Recommendation') + ' {:.2f}/10'.format(buffet_approved * 10 / buffet_criterias))
+print(tr('Pros') + ': {}'.format(buffet_approved_summary))
+print(tr('Cons') + ': {}'.format(buffet_not_approved_summary))
 
 if slater_approved / slater_criterias > 0.5 and slater_approved / slater_criterias < 0.7:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('meets some of Jim Slater\'s selection criteria'))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('meets some of Jim Slater\'s selection criteria'))
 elif slater_approved / slater_criterias > 0.7:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('meets most of Jim Slater\'s selection criteria'))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('meets most of Jim Slater\'s selection criteria'))
 else:
-    print('\n' + _('The stock value of') + ' {} '.format(company_name) + _('does not meet Jim Slater\'s selection criteria'))
-print('\n' + _('Recommendation') + ' {:.2f}/10'.format(slater_approved * 10 / slater_criterias))
-print(_('Pros') + ': {}'.format(slater_approved_summary))
-print(_('Cons') + ': {}'.format(slater_not_approved_summary))
+    print('\n' + tr('The stock value of') + ' {} '.format(company_name) + tr('does not meet Jim Slater\'s selection criteria'))
+print('\n' + tr('Recommendation') + ' {:.2f}/10'.format(slater_approved * 10 / slater_criterias))
+print(tr('Pros') + ': {}'.format(slater_approved_summary))
+print(tr('Cons') + ': {}'.format(slater_not_approved_summary))
