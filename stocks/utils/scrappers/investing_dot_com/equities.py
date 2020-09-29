@@ -3,6 +3,10 @@ import requests
 import datetime
 import numpy as np
 
+from .income_statement import IncomeStatement
+from .balance_sheet import BalanceSheet
+from .ratios import Ratios
+
 symbols = {
     "MSFT": "microsoft-corp",
     "KPSN": "kinepolis-group"
@@ -13,59 +17,54 @@ http_headers = {
   "X-Requested-With": "XMLHttpRequest"
 }
 
-url_prefix = "https://www.investing.com/equities/"
-
-class base:
-    url = ""
-    data = None
-
-    def __init__(self, symbol, url_suffix):
+class Equity:
+    def __init__(self, symbol):
         symbol = symbol.upper().split('.')[0]
         if not symbol in symbols.keys():
             raise Exception("Symbol not found in dict")
-        self.url = f"{url_prefix}{symbols[symbol]}{url_suffix}"
+        self.url = f"https://www.investing.com/equities/{symbols[symbol]}"
 
-class income_statement(base):
-    request = None
-    data = None
-
-    def __init__(self, symbol):
-        super().__init__(symbol, "-income-statement")
-        request = requests.get(self.url, headers=http_headers)
+    def income_statement(self):
+        request = requests.get(self.url + "-income-statement", headers=http_headers)
         dfs = pd.read_html(request.text)
         columns = np.squeeze(dfs[1].tail(1).values.tolist())
-        for i in range(1,len(columns)):
-            columns[i] = datetime.datetime.strptime(columns[i], '%Y%d/%m').strftime('%d/%m/%Y')
+        columns = columns[1:]
+        for i in range(len(columns)):
+            columns[i] = datetime.datetime.strptime(columns[i], "%Y%d/%m").strftime("%d/%m/%Y")
         pretty = dfs[1][:-1]
+        # use first column values as index
+        pretty.index = pretty.iloc[:, 0]
+        pretty.index.name = ""
+        # remove first column
+        pretty = pretty.drop(columns=[0])
         pretty.columns = columns
-        pretty = pretty.drop(1).drop(7)
-        self.data = pretty.reset_index(drop=True)
+        return IncomeStatement(pretty)
 
-class balance_sheet(base):
-    request = None
-    data = None
-
-    def __init__(self, symbol):
-        super().__init__(symbol, "-balance-sheet")
-        request = requests.get(self.url, headers=http_headers)
+    def balance_sheet(self):
+        request = requests.get(self.url + "-balance-sheet", headers=http_headers)
         dfs = pd.read_html(request.text)
         columns = np.squeeze(dfs[1].tail(1).values.tolist())
-        for i in range(1,len(columns)):
-            columns[i] = datetime.datetime.strptime(columns[i], '%Y%d/%m').strftime('%d/%m/%Y')
+        columns = columns[1:]
+        for i in range(len(columns)):
+            columns[i] = datetime.datetime.strptime(columns[i], "%Y%d/%m").strftime("%d/%m/%Y")
+        # remove the last row as it will be used as column name
         pretty = dfs[1][:-1]
+        # use first column values as index
+        pretty.index = pretty.iloc[:, 0]
+        pretty.index.name = ""
+        # remove first column
+        pretty = pretty.drop(columns=[0])
         pretty.columns = columns
-        pretty = pretty.drop(1).drop(12).drop(23).drop(31).drop(39)
-        self.data = pretty.reset_index(drop=True)
+        return BalanceSheet(pretty)
 
-    def total_common_shares_outstanding(self):
-        return int(float(self.data.iat[45, 1])*1e6)
-
-class ratios(base):
-
-    def __init__(self, symbol):
-        super().__init__(symbol, "-ratios")
-        request = requests.get(self.url, headers=http_headers)
+    def ratios(self):
+        request = requests.get(self.url + "-ratios", headers=http_headers)
         dfs = pd.read_html(request.text)
         dfs[3] = dfs[3][1:]
         dfs[5] = dfs[5][1:]
-        self.data = pd.DataFrame(pd.concat(dfs[2:10]).values, columns=['Name', 'Compagny', 'Industry'])
+        pretty = pd.DataFrame(pd.concat(dfs[2:10]).values, columns=["Name", "Compagny", "Industry"])
+        # use first column values as index
+        pretty.index = pretty.iloc[:, 0]
+        # remove first column
+        pretty = pretty.drop(columns=["Name"])
+        return Ratios(pretty)

@@ -15,18 +15,16 @@ from utils.scrappers.yahoo_finance import apikeys
 logging.basicConfig(level=logging.INFO, format=f"%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
-parser = argparse.ArgumentParser(description='Perform a fundamental analysis of a compagny')
-parser.add_argument('symbol', type=str, help='The company symbol')
-parser.add_argument('-k', '--apikey', type=str, help='API key')
-parser.add_argument('-u', '--update', action='store_true', default=False,
-                    help='Update cached company data')
-parser.add_argument('-l', '--locale', default='en',
-                    help='Language')
+parser = argparse.ArgumentParser(description="Perform a fundamental analysis of a compagny")
+parser.add_argument("symbol", type=str, help="The company's symbol")
+parser.add_argument("-k", "--apikey", type=str, help="Yahoo Finance API key")
+parser.add_argument("-u", "--update", action="store_true", default=False, help="Update cached company data")
+parser.add_argument("-l", "--language", default="en", help="Language")
 
 args = parser.parse_args()
 
 # get translator
-tr = Translator(args.locale)
+tr = Translator(args.language)
 
 # fetch api key(s)
 keys = []
@@ -35,7 +33,7 @@ if args.apikey:
 else:
     keys = apikeys.load()
     if not keys:
-        print(tr('No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory'))
+        print(tr("No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory"))
         exit(0)
 
 # update cache
@@ -96,7 +94,7 @@ company_name = financials['quoteType']['longName']
 if len(financials['summaryDetail']['marketCap']) > 0:
     market_cap = financials['summaryDetail']['marketCap']['raw']
 else:
-    market_cap = equities.balance_sheet(symbol).total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
+    market_cap = equities.Equity(symbol).balance_sheet().total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
