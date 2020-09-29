@@ -2,8 +2,7 @@ import os
 import logging
 
 
-logging.basicConfig(level=logging.ERROR, format=f'%(asctime)s | %(levelname)s | %(funcName)s | %(message)s')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 def load():
     keys_dir = "./keys"

@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import os
 import urllib.request
 import requests
@@ -10,10 +11,9 @@ from utils.translate import Translator
 from utils.scrappers.investing_dot_com import equities
 from utils.scrappers.yahoo_finance import apikeys
 
-def printv(msg):
-    if args.verbose:
-        print(msg)
 
+logging.basicConfig(level=logging.INFO, format=f"%(asctime)s | %(levelname)s | %(message)s")
+logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='Perform a fundamental analysis of a compagny')
 parser.add_argument('symbol', type=str, help='The company symbol')
@@ -21,9 +21,7 @@ parser.add_argument('-k', '--apikey', type=str, help='API key')
 parser.add_argument('-u', '--update', action='store_true', default=False,
                     help='Update cached company data')
 parser.add_argument('-l', '--locale', default='en',
-                    help='Language')                    
-parser.add_argument('-v', '--verbose', action='store_true', default=False,
-                    help='Show additional traces')
+                    help='Language')
 
 args = parser.parse_args()
 
@@ -47,12 +45,12 @@ update = args.update
 symbol = args.symbol.upper()
 
 # create cache directory if it doesn't exit
-cache_dir = './cache'
+cache_dir = "./cache"
 if not os.path.exists(cache_dir):
-    printv('Creating cache folder')
+    logger.debug("Creating cache folder")
     os.mkdir(cache_dir)
 
-filename = os.path.join(cache_dir, symbol + '.json')
+filename = os.path.join(cache_dir, symbol + ".json")
 if not os.path.exists(filename):
     update = True
 
@@ -106,7 +104,7 @@ if 'totalRevenue' in income_statements[0]:
     revenue = income_statements[0]['totalRevenue']['raw']
 else:
     revenue = None
-    printv('WARNING: Revenue value could not be found')
+    logger.warning("Revenue value could not be found")
 
 ebit = income_statements[0]['ebit']['raw']
 earnings = income_statements[0]['netIncome']['raw']
@@ -124,16 +122,16 @@ elif len(financials['timeSeries']['annualInterestExpense']) > 0:
         interest_expense = annual_interest_expense[-1]['reportedValue']['raw']
     else:
         interest_expense = None
-        printv('WARNING: Interest expense value could not be found')
+        logger.warning("Interest expense value could not be found")
 else:
     interest_expense = None
-    printv('WARNING: Interest expense value could not be found')
+    logger.warning("Interest expense value could not be found")
 
 if len(income_statements[0]['sellingGeneralAdministrative']) > 0:
     sga = income_statements[0]['sellingGeneralAdministrative']['raw']
 else:
     sga = None
-    printv('WARNING: SG&A value could not be found')
+    logger.warning("SG&A value could not be found")
 
 operating_expense = income_statements[0]['totalOperatingExpenses']['raw']
 
@@ -142,7 +140,7 @@ if len(annual_ebitda) > 0:
     ebitda = annual_ebitda[-1]['reportedValue']['raw']
 else:
     ebitda = None
-    printv('WARNING: EBITDA value could not be found')
+    logger.warning("EBITDA value could not be found")
 
 ## balance-sheet
 balance_sheet = data[1]
@@ -155,7 +153,7 @@ if 'propertyPlantEquipment' in balance_sheet_statements[0]:
     property_plant_equipment = balance_sheet_statements[0]['propertyPlantEquipment']['raw']
 else:
     property_plant_equipment = None
-    printv('WARNING: Property Plant Equipment value could not be found')
+    logger.warning("Property Plant Equipment value could not be found")
 
 # intangible_assets = balance_sheet_statements[0]['intangibleAssets']['raw']
 current_assets = balance_sheet_statements[0]['totalCurrentAssets']['raw']
@@ -169,28 +167,28 @@ else:
         long_term_debt = balance_sheet_statements[0]['longTermDebt']['raw']
     else:
         long_term_debt = None
-        printv('WARNING: Annual long term debt value could not be found')
+        logger.warning("Annual long term debt value could not be found")
 
 annual_cash_and_cash_equivalents = balance_sheet['timeSeries']['annualCashAndCashEquivalents']
 if len(annual_cash_and_cash_equivalents) > 0 and annual_cash_and_cash_equivalents[-1]:
     cash_and_cash_equivalents = annual_cash_and_cash_equivalents[-1]['reportedValue']['raw']
 else:
     cash_and_cash_equivalents = None
-    printv('WARNING: Cash and cash equivalents value could not be found')
+    logger.warning("Cash and cash equivalents value could not be found")
 
 annual_other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments']
 if len(annual_other_short_term_investments) > 0 and annual_other_short_term_investments[-1]:
     other_short_term_investments = annual_other_short_term_investments[-1]['reportedValue']['raw']
 else:
     other_short_term_investments = None
-    printv('WARNING: Other short term investments value could not be found')
+    logger.warning("Other short term investments value could not be found")
 
 annual_accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable']
 if len(annual_accounts_receivable) > 0 and annual_accounts_receivable[-1]:
     accounts_receivable = annual_accounts_receivable[-1]['reportedValue']['raw']
 else:
     accounts_receivable = None
-    printv('WARNING: Accounts receivable value could not be found')
+    logger.warning("Accounts receivable value could not be found")
 
 # goodwill = balance_sheet['timeSeries']['annualGoodwill'][-1]['reportedValue']['raw']
 
@@ -199,7 +197,7 @@ if len(annual_current_debt) > 0 and annual_current_debt[-1]:
     short_term_debt = annual_current_debt[-1]['reportedValue']['raw']
 else:
     short_term_debt = None
-    printv('WARNING: Annual current debt value could not be found')
+    logger.warning("Annual current debt value could not be found")
 
 ## cash flow
 cash_flow = financials['cashflowStatementHistory']['cashflowStatements']
@@ -210,7 +208,7 @@ elif 'capitalExpenditures' in cash_flow[1]:
     capital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
 else:
     capital_expenditures = None
-    printv('WARNING: Capital expenditures value could not be found')
+    logger.warning("Capital expenditures value could not be found")
 
 if 'depreciation' in cash_flow[0]:
     depreciation = cash_flow[0]['depreciation']['raw']
@@ -218,7 +216,7 @@ elif 'depreciation' in cash_flow[1]:
     depreciation = cash_flow[1]['depreciation']['raw']
 else:
     depreciation = None
-    printv('WARNING: Depreciation value could not be found')
+    logger.warning("Depreciation value could not be found")
 
 buffet_approved = 0
 buffet_criterias = 0
@@ -278,7 +276,7 @@ for i in reversed(range(l)):
 
 earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate']['fmt'][:4]) + 1))
 earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
-printv('\n* ' + tr('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
+print('\n* ' + tr('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
 
 ## market cap
 if market_cap:
@@ -290,7 +288,7 @@ if market_cap:
         slater_not_approved_summary += '\n-' + tr('Slater prefers smallcaps')
 
 ## profitability
-printv(tr('Profitability') + ':')
+print(tr('Profitability') + ':')
 
 # gross margin
 gross_margin = gross_profit / revenue * 100
@@ -300,11 +298,11 @@ if gross_margin > 40:
     buffet_approved_summary += '\n-' + tr('The gross margin is higher than') + ' 40% ({:.2f}%)'.format(gross_margin)
 else:
     buffet_not_approved_summary += '\n-' + tr('The gross margin is lower than') + ' 40% ({:.2f}%)'.format(gross_margin)
-printv(tr('Gross margin') + ' (TTM): {:.2f}%'.format(gross_margin))
+print(tr('Gross margin') + ' (TTM): {:.2f}%'.format(gross_margin))
 
 # operating margin
 operating_margin = operating_income / revenue * 100
-printv(tr('Operating margin') + ' (TTM): {:.2f}%'.format(operating_margin))
+print(tr('Operating margin') + ' (TTM): {:.2f}%'.format(operating_margin))
 
 # net margin
 net_margin = net_income / revenue * 100
@@ -314,10 +312,10 @@ if net_margin > 20:
     buffet_approved_summary += '\n-' + tr('The net margin is higher than') + ' 20% ({:.2f}%)'.format(net_margin)
 else:
     buffet_not_approved_summary += '\n-' + tr('The net margin is lower than') + ' 20% ({:.2f}%)'.format(net_margin)
-printv(tr('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
+print(tr('Net margin') + ' (TTM): {:.2f}%'.format(net_margin))
 
 ## overall financial performance
-printv('\n' + tr('Overral financial performance') + ':')
+print('\n' + tr('Overral financial performance') + ':')
 
 if short_term_debt and long_term_debt and market_cap:
     # ev / ebitda ratio
@@ -330,18 +328,18 @@ if short_term_debt and long_term_debt and market_cap:
             comment = tr('excellent')
         elif ev_ebitda_ratio < 14:
             comment = tr('good')
-        printv('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
+        print('EV/EBITDA: {:.2f} -> {}'.format(enterprise_value / ebitda, comment))
 
     # ebit / ev multiple
     ebit_ev_multiple = ebit / enterprise_value
-    printv('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
+    print('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
 
 # # eps
 # basic_eps = net_income_applicable_to_common_shares / common_shares
-# printv('EPS: {}'.format(basic_eps))
+# print('EPS: {}'.format(basic_eps))
 
 ## management effectivness
-printv('\n' + tr('Management effectivness') + ':')
+print('\n' + tr('Management effectivness') + ':')
 # roa
 roa = net_income / total_assets * 100
 comment = tr('bad')
@@ -349,7 +347,7 @@ if roa > 5:
     comment = tr('good')
 if roa > 10:
     comment = tr('excellent')
-printv('ROA (TTM): {:.2f}% -> {}'.format(roa, comment))
+print('ROA (TTM): {:.2f}% -> {}'.format(roa, comment))
 
 # roce (return on capital employed)
 slater_criterias += 1
@@ -362,7 +360,7 @@ if roce > 20:
     slater_approved_summary += '\n-' + tr('The return on capital employed is higher than') + ' 20% ({:.2f}%)'.format(roce)
 else:
     slater_not_approved_summary += '\n-' + tr('The return on capital employed is lower than') + ' 20% ({:.2f}%)'.format(roce)
-printv('ROCE (TTM): {:.2f}% -> {}'.format(roce, comment))
+print('ROCE (TTM): {:.2f}% -> {}'.format(roce, comment))
 
 # roe
 roe = net_income / stockholder_equity * 100
@@ -371,10 +369,10 @@ if roe >= 15 and roe <= 20:
     comment = tr('good')
 elif roe > 20:
     comment = tr('excellent')
-printv('ROE (TTM): {:.2f}% -> {}'.format(roe, comment))
+print('ROE (TTM): {:.2f}% -> {}'.format(roe, comment))
 
 ## balance sheet
-printv('\n' + tr('Balance sheet') + ':')
+print('\n' + tr('Balance sheet') + ':')
 
 # current ratio
 buffet_criterias += 1
@@ -391,7 +389,7 @@ else:
     if current_ratio < 1:
         comment = tr('very bad')
         buffet_not_approved_summary += '\n-' + tr('The company must acquire new debt to pay its debt obligations')
-printv(tr('Current ratio') + ' (TTM): {:.2f} -> {}'.format(current_ratio, comment))
+print(tr('Current ratio') + ' (TTM): {:.2f} -> {}'.format(current_ratio, comment))
 
 # quick ratio
 if other_short_term_investments and accounts_receivable and cash_and_cash_equivalents:
@@ -407,7 +405,7 @@ if other_short_term_investments and accounts_receivable and cash_and_cash_equiva
     else: 
         comment = tr('bad')
         slater_not_approved_summary += '\n-' + tr('The company doesn\'t have good financials, it\'s QR is lower than') + ' 1 ({:.2f})'.format(quick_ratio)
-    printv('QR (TTM): {:.2f} -> {}'.format(quick_ratio, comment))
+    print('QR (TTM): {:.2f} -> {}'.format(quick_ratio, comment))
 
 if sga:
     buffet_criterias += 1
