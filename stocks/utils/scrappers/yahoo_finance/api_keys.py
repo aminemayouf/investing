@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger()
 
-def load():
+def get_api_keys():
     keys_dir = "./keys"
     keys = []
     if not os.path.exists(keys_dir):

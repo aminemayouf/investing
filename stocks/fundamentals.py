@@ -8,8 +8,8 @@ import numpy as np
 from tabulate import tabulate
 from utils.millify import millify
 from utils.translate import Translator
-from utils.scrappers.investing_dot_com import equities
-from utils.scrappers.yahoo_finance import apikeys
+import utils.scrappers.investing as inv
+import utils.scrappers.yahoo_finance as yf
 
 
 logging.basicConfig(level=logging.INFO, format=f"%(asctime)s | %(levelname)s | %(message)s")
@@ -31,7 +31,7 @@ keys = []
 if args.apikey:
     keys.append(args.apikey)
 else:
-    keys = apikeys.load()
+    keys = yf.get_api_keys()
     if not keys:
         print(tr("No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory"))
         exit(0)
@@ -94,7 +94,7 @@ company_name = financials['quoteType']['longName']
 if len(financials['summaryDetail']['marketCap']) > 0:
     market_cap = financials['summaryDetail']['marketCap']['raw']
 else:
-    market_cap = equities.Equity(symbol).balance_sheet().total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
+    market_cap = inv.Equity(symbol).balance_sheet().total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
