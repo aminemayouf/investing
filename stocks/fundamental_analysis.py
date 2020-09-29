@@ -8,7 +8,7 @@ import gettext
 from tabulate import tabulate
 from utils.millify import millify
 from utils.scrappers.investing_dot_com import equities
-
+from utils.scrappers.yahoo_finance import apikeys
 
 def printv(msg):
     if args.verbose:
@@ -37,18 +37,16 @@ if not args.locale == 'en':
         print(_('The specified language was not found, the default language will be used'))
 
 # fetch api key(s)
-apikeys = []
+keys = []
 if args.apikey:
-    apikeys.append(args.apikey)
+    keys.append(args.apikey)
 else:
-    keys_dir = './keys'
-    if not os.path.exists(keys_dir):
-        printv('Creating keys directory')
-        os.mkdir(keys_dir)
+    keys = apikeys.load()
+    if not keys:
         print(_('No keys found, please provide an API key or create an empty file and name it with the API key and place you key in key(s) under <keys> directory'))
         exit(0)
-    for file in os.listdir(keys_dir):
-        apikeys.append(file)
+
+# update cache
 update = args.update
 
 # convert company symbol to uppercase
@@ -73,7 +71,7 @@ if update:
     querystring = {"symbol": symbol}
     headers = {
         'x-rapidapi-host': "apidojo-yahoo-finance-v1.p.rapidapi.com",
-        'x-rapidapi-key': apikeys[0]
+        'x-rapidapi-key': keys[0]
     }
     response = requests.request("GET", url, headers=headers, params=querystring,)
     if not response:
