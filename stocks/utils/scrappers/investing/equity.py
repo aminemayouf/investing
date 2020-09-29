@@ -19,7 +19,7 @@ http_headers = {
 
 class Equity:
     def __init__(self, symbol):
-        symbol = symbol.upper().split('.')[0]
+        symbol = symbol.upper().split(".")[0]
         if not symbol in symbols.keys():
             raise Exception("Symbol not found in dict")
         self.url = f"https://www.investing.com/equities/{symbols[symbol]}"
@@ -38,6 +38,12 @@ class Equity:
         # remove first column
         pretty = pretty.drop(columns=[0])
         pretty.columns = columns
+        # set non numeric values to NaN
+        pretty = pretty.apply(pd.to_numeric, errors="coerce")
+        # drop rows when all cells are set to NaN
+        pretty = pretty.dropna(how="all")
+        # values are actually in millions
+        pretty *= 1e6
         return IncomeStatement(pretty)
 
     def balance_sheet(self):
@@ -55,6 +61,12 @@ class Equity:
         # remove first column
         pretty = pretty.drop(columns=[0])
         pretty.columns = columns
+        # set non numeric values to NaN
+        pretty = pretty.apply(pd.to_numeric, errors="coerce")
+        # drop rows when all cells are set to NaN
+        pretty = pretty.dropna(how="all")
+        # values are actually in millions
+        pretty *= 1e6
         return BalanceSheet(pretty)
 
     def ratios(self):
@@ -62,7 +74,7 @@ class Equity:
         dfs = pd.read_html(request.text)
         dfs[3] = dfs[3][1:]
         dfs[5] = dfs[5][1:]
-        pretty = pd.DataFrame(pd.concat(dfs[2:10]).values, columns=["Name", "Compagny", "Industry"])
+        pretty = pd.DataFrame(pd.concat(dfs[2:10]).values, columns=["Name", "Company", "Industry"])
         # use first column values as index
         pretty.index = pretty.iloc[:, 0]
         # remove first column

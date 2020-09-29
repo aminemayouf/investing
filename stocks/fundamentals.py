@@ -94,7 +94,7 @@ company_name = financials['quoteType']['longName']
 if len(financials['summaryDetail']['marketCap']) > 0:
     market_cap = financials['summaryDetail']['marketCap']['raw']
 else:
-    market_cap = inv.Equity(symbol).balance_sheet().total_common_shares_outstanding() * financials['price']['regularMarketOpen']['raw']
+    market_cap = inv.Equity(symbol).balance_sheet().total_common_shares_outstanding()[0] * financials['price']['regularMarketOpen']['raw']
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
