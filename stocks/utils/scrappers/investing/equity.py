@@ -9,7 +9,8 @@ from .ratios import Ratios
 
 symbols = {
     "MSFT": "microsoft-corp",
-    "KPSN": "kinepolis-group"
+    "KPSN": "kinepolis-group",
+    "VMX": "inside-secure-sa"
 }
 
 http_headers = {

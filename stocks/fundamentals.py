@@ -102,7 +102,7 @@ if 'totalRevenue' in income_statements[0]:
     revenue = income_statements[0]['totalRevenue']['raw']
 else:
     revenue = None
-    logger.warning("Revenue value could not be found")
+    logger.notice("Revenue value could not be found")
 
 ebit = income_statements[0]['ebit']['raw']
 earnings = income_statements[0]['netIncome']['raw']
@@ -120,16 +120,16 @@ elif len(financials['timeSeries']['annualInterestExpense']) > 0:
         interest_expense = annual_interest_expense[-1]['reportedValue']['raw']
     else:
         interest_expense = None
-        logger.warning("Interest expense value could not be found")
+        logger.notice("Interest expense value could not be found")
 else:
     interest_expense = None
-    logger.warning("Interest expense value could not be found")
+    logger.notice("Interest expense value could not be found")
 
 if len(income_statements[0]['sellingGeneralAdministrative']) > 0:
     sga = income_statements[0]['sellingGeneralAdministrative']['raw']
 else:
     sga = None
-    logger.warning("SG&A value could not be found")
+    logger.notice("SG&A value could not be found")
 
 operating_expense = income_statements[0]['totalOperatingExpenses']['raw']
 
@@ -138,7 +138,7 @@ if len(annual_ebitda) > 0:
     ebitda = annual_ebitda[-1]['reportedValue']['raw']
 else:
     ebitda = None
-    logger.warning("EBITDA value could not be found")
+    logger.notice("EBITDA value could not be found")
 
 ## balance-sheet
 balance_sheet = data[1]
@@ -151,7 +151,7 @@ if 'propertyPlantEquipment' in balance_sheet_statements[0]:
     property_plant_equipment = balance_sheet_statements[0]['propertyPlantEquipment']['raw']
 else:
     property_plant_equipment = None
-    logger.warning("Property Plant Equipment value could not be found")
+    logger.notice("Property Plant Equipment value could not be found")
 
 # intangible_assets = balance_sheet_statements[0]['intangibleAssets']['raw']
 current_assets = balance_sheet_statements[0]['totalCurrentAssets']['raw']
@@ -165,28 +165,28 @@ else:
         long_term_debt = balance_sheet_statements[0]['longTermDebt']['raw']
     else:
         long_term_debt = None
-        logger.warning("Annual long term debt value could not be found")
+        logger.notice("Annual long term debt value could not be found")
 
 annual_cash_and_cash_equivalents = balance_sheet['timeSeries']['annualCashAndCashEquivalents']
 if len(annual_cash_and_cash_equivalents) > 0 and annual_cash_and_cash_equivalents[-1]:
     cash_and_cash_equivalents = annual_cash_and_cash_equivalents[-1]['reportedValue']['raw']
 else:
     cash_and_cash_equivalents = None
-    logger.warning("Cash and cash equivalents value could not be found")
+    logger.notice("Cash and cash equivalents value could not be found")
 
 annual_other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments']
 if len(annual_other_short_term_investments) > 0 and annual_other_short_term_investments[-1]:
     other_short_term_investments = annual_other_short_term_investments[-1]['reportedValue']['raw']
 else:
     other_short_term_investments = None
-    logger.warning("Other short term investments value could not be found")
+    logger.notice("Other short term investments value could not be found")
 
 annual_accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable']
 if len(annual_accounts_receivable) > 0 and annual_accounts_receivable[-1]:
     accounts_receivable = annual_accounts_receivable[-1]['reportedValue']['raw']
 else:
     accounts_receivable = None
-    logger.warning("Accounts receivable value could not be found")
+    logger.notice("Accounts receivable value could not be found")
 
 # goodwill = balance_sheet['timeSeries']['annualGoodwill'][-1]['reportedValue']['raw']
 
@@ -194,8 +194,10 @@ annual_current_debt = balance_sheet['timeSeries']['annualCurrentDebt']
 if len(annual_current_debt) > 0 and annual_current_debt[-1]:
     short_term_debt = annual_current_debt[-1]['reportedValue']['raw']
 else:
-    short_term_debt = None
-    logger.warning("Annual current debt value could not be found")
+
+    # gives only an approximation
+    short_term_debt = inv.Equity(symbol).balance_sheet().current_debt_and_capital_lease_obligation()[0]
+    logger.warning("Short term debt value may not be very accurate")
 
 ## cash flow
 cash_flow = financials['cashflowStatementHistory']['cashflowStatements']
@@ -206,7 +208,7 @@ elif 'capitalExpenditures' in cash_flow[1]:
     capital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
 else:
     capital_expenditures = None
-    logger.warning("Capital expenditures value could not be found")
+    logger.notice("Capital expenditures value could not be found")
 
 if 'depreciation' in cash_flow[0]:
     depreciation = cash_flow[0]['depreciation']['raw']
@@ -214,7 +216,7 @@ elif 'depreciation' in cash_flow[1]:
     depreciation = cash_flow[1]['depreciation']['raw']
 else:
     depreciation = None
-    logger.warning("Depreciation value could not be found")
+    logger.notice("Depreciation value could not be found")
 
 buffet_approved = 0
 buffet_criterias = 0
