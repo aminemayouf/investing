@@ -240,52 +240,52 @@ print('\n' + tr('Fundamental analysis of') + ' {} :\n'.format(company_name))
 
 # predict next year earnings using linear regression
 l = len(income_statements)
-print(income_statements)
-n = int(np.floor(np.divide(l, 3)))
-m = len(income_statements) - (n * 2)
+if l >= 3:
+    n = int(np.floor(np.divide(l, 3)))
+    m = len(income_statements) - (n * 2)
 
-y1 = 0
-e1 = 0
-for i in reversed(range(0, n)):
-    y1 += int(income_statements[i]['endDate']['fmt'][:4])
-    e1 += income_statements[i]['netIncome']['raw']
-y1 /= n
-e1 /= n
-m1 = (y1, e1)
+    y1 = 0
+    e1 = 0
+    for i in reversed(range(0, n)):
+        y1 += int(income_statements[i]['endDate']['fmt'][:4])
+        e1 += income_statements[i]['netIncome']['raw']
+    y1 /= n
+    e1 /= n
+    m1 = (y1, e1)
 
-y2 = 0
-e2 = 0
-for i in reversed(range(n, l - n)):
-    y2 += int(income_statements[i]['endDate']['fmt'][:4])
-    e2 += income_statements[i]['netIncome']['raw']
-y2 /= l - (n * 2)
-e2 /= l - (n * 2)
-m2 = (y2, e2)
+    y2 = 0
+    e2 = 0
+    for i in reversed(range(n, l - n)):
+        y2 += int(income_statements[i]['endDate']['fmt'][:4])
+        e2 += income_statements[i]['netIncome']['raw']
+    y2 /= l - (n * 2)
+    e2 /= l - (n * 2)
+    m2 = (y2, e2)
 
-y3 = 0
-e3 = 0
+    y3 = 0
+    e3 = 0
 
-for i in reversed(range(l-n, l)):
-    y3 += int(income_statements[i]['endDate']['fmt'][:4])
-    e3 += income_statements[i]['netIncome']['raw']
-y3 /= n
-e3 /= n
-m3 = (y3, e3)
+    for i in reversed(range(l-n, l)):
+        y3 += int(income_statements[i]['endDate']['fmt'][:4])
+        e3 += income_statements[i]['netIncome']['raw']
+    y3 /= n
+    e3 /= n
+    m3 = (y3, e3)
 
-p = ((m1[0]+m2[0]+m3[0]) / 3, (m1[1]+m2[1]+m3[1]) / 3)
+    p = ((m1[0]+m2[0]+m3[0]) / 3, (m1[1]+m2[1]+m3[1]) / 3)
 
-a = (m3[1]-m1[1])/(m3[0]-m1[0])
-b = p[1] - (a * p[0])
+    a = (m3[1]-m1[1])/(m3[0]-m1[0])
+    b = p[1] - (a * p[0])
 
-earnings_table_headers = []
-earnings_table = []
-for i in reversed(range(l)):
-        earnings_table_headers.append(income_statements[i]['endDate']['fmt'][:4])
-        earnings_table.append(income_statements[i]['netIncome']['fmt'])
+    earnings_table_headers = []
+    earnings_table = []
+    for i in reversed(range(l)):
+            earnings_table_headers.append(income_statements[i]['endDate']['fmt'][:4])
+            earnings_table.append(income_statements[i]['netIncome']['fmt'])
 
-earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate']['fmt'][:4]) + 1))
-earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
-print('\n* ' + tr('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
+    earnings_table_headers.append('Est. {}'.format(int(income_statements[0]['endDate']['fmt'][:4]) + 1))
+    earnings_table.append(millify(a * (int(income_statements[0]['endDate']['fmt'][:4]) + 1) + b))
+    print('\n* ' + tr('Change in net income') + ':\n\n+' + tabulate([earnings_table], headers=earnings_table_headers) + '\n')
 
 ## market cap
 if market_cap:
