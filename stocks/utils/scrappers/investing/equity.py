@@ -100,6 +100,5 @@ class Equity:
             pretty.index = pretty.iloc[:, 0]
             # remove first column
             pretty = pretty.drop(columns=["Name"])
-            print(pretty)
             self.cached_ratios = Ratios(pretty)
         return self.cached_ratios

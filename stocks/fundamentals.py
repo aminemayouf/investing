@@ -521,7 +521,7 @@ if long_term_debt:
 
 # inventory trend
 inventory = balance_sheet['timeSeries']['annualInventory']
-if len(inventory) > 0:
+if len(inventory) > 0 and len(inventory) == len(income_statements):
     buffet_criterias += 1
     inline_with_each_other = True
     for i in range(len(inventory)-1):
