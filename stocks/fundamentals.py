@@ -88,13 +88,15 @@ else:
 
 print('\n')
 
+equity = inv.Equity(symbol)
+
 ### exctract infos
 financials = data[0]
 company_name = financials['quoteType']['longName']
 if len(financials['summaryDetail']['marketCap']) > 0:
     market_cap = financials['summaryDetail']['marketCap']['raw']
 else:
-    market_cap = inv.Equity(symbol).balance_sheet().total_common_shares_outstanding()[0] * financials['price']['regularMarketOpen']['raw']
+    market_cap = equity.balance_sheet().total_common_shares_outstanding()[0] * financials['price']['regularMarketOpen']['raw']
 
 ## income statement
 income_statements = financials['incomeStatementHistory']['incomeStatementHistory']
@@ -102,14 +104,16 @@ if 'totalRevenue' in income_statements[0]:
     revenue = income_statements[0]['totalRevenue']['raw']
 else:
     revenue = None
-    logger.notice("Revenue value could not be found")
+    logger.warning("Revenue value could not be found")
 
 ebit = income_statements[0]['ebit']['raw']
 earnings = income_statements[0]['netIncome']['raw']
-# net_income_applicable_to_common_shares = income_statements[0]['netIncomeApplicableToCommonShares']['raw']
+net_income_applicable_to_common_shares = income_statements[0]['netIncomeApplicableToCommonShares']['raw']
 gross_profit = income_statements[0]['grossProfit']['raw']
 operating_income = income_statements[0]['operatingIncome']['raw']
 net_income = income_statements[0]['netIncome']['raw']
+
+common_shares_outstaning = equity.balance_sheet().total_common_shares_outstanding()[0]
 
 # interest expense
 if len(income_statements[0]['interestExpense']) > 0:
@@ -120,16 +124,16 @@ elif len(financials['timeSeries']['annualInterestExpense']) > 0:
         interest_expense = annual_interest_expense[-1]['reportedValue']['raw']
     else:
         interest_expense = None
-        logger.notice("Interest expense value could not be found")
+        logger.warning("Interest expense value could not be found")
 else:
     interest_expense = None
-    logger.notice("Interest expense value could not be found")
+    logger.warning("Interest expense value could not be found")
 
 if len(income_statements[0]['sellingGeneralAdministrative']) > 0:
     sga = income_statements[0]['sellingGeneralAdministrative']['raw']
 else:
     sga = None
-    logger.notice("SG&A value could not be found")
+    logger.warning("SG&A value could not be found")
 
 operating_expense = income_statements[0]['totalOperatingExpenses']['raw']
 
@@ -138,12 +142,11 @@ if len(annual_ebitda) > 0:
     ebitda = annual_ebitda[-1]['reportedValue']['raw']
 else:
     ebitda = None
-    logger.notice("EBITDA value could not be found")
+    logger.warning("EBITDA value could not be found")
 
 ## balance-sheet
 balance_sheet = data[1]
 balance_sheet_statements = balance_sheet['balanceSheetHistory']['balanceSheetStatements']
-# common_shares = balance_sheet_statements[0]['commonStock']['raw']
 total_assets = balance_sheet_statements[0]['totalAssets']['raw']
 stockholder_equity =  balance_sheet_statements[0]['totalStockholderEquity']['raw']
 
@@ -151,7 +154,7 @@ if 'propertyPlantEquipment' in balance_sheet_statements[0]:
     property_plant_equipment = balance_sheet_statements[0]['propertyPlantEquipment']['raw']
 else:
     property_plant_equipment = None
-    logger.notice("Property Plant Equipment value could not be found")
+    logger.warning("Property Plant Equipment value could not be found")
 
 # intangible_assets = balance_sheet_statements[0]['intangibleAssets']['raw']
 current_assets = balance_sheet_statements[0]['totalCurrentAssets']['raw']
@@ -165,28 +168,28 @@ else:
         long_term_debt = balance_sheet_statements[0]['longTermDebt']['raw']
     else:
         long_term_debt = None
-        logger.notice("Annual long term debt value could not be found")
+        logger.warning("Annual long term debt value could not be found")
 
 annual_cash_and_cash_equivalents = balance_sheet['timeSeries']['annualCashAndCashEquivalents']
 if len(annual_cash_and_cash_equivalents) > 0 and annual_cash_and_cash_equivalents[-1]:
     cash_and_cash_equivalents = annual_cash_and_cash_equivalents[-1]['reportedValue']['raw']
 else:
     cash_and_cash_equivalents = None
-    logger.notice("Cash and cash equivalents value could not be found")
+    logger.warning("Cash and cash equivalents value could not be found")
 
 annual_other_short_term_investments = balance_sheet['timeSeries']['annualOtherShortTermInvestments']
 if len(annual_other_short_term_investments) > 0 and annual_other_short_term_investments[-1]:
     other_short_term_investments = annual_other_short_term_investments[-1]['reportedValue']['raw']
 else:
     other_short_term_investments = None
-    logger.notice("Other short term investments value could not be found")
+    logger.warning("Other short term investments value could not be found")
 
 annual_accounts_receivable = balance_sheet['timeSeries']['annualAccountsReceivable']
 if len(annual_accounts_receivable) > 0 and annual_accounts_receivable[-1]:
     accounts_receivable = annual_accounts_receivable[-1]['reportedValue']['raw']
 else:
     accounts_receivable = None
-    logger.notice("Accounts receivable value could not be found")
+    logger.warning("Accounts receivable value could not be found")
 
 # goodwill = balance_sheet['timeSeries']['annualGoodwill'][-1]['reportedValue']['raw']
 
@@ -196,7 +199,7 @@ if len(annual_current_debt) > 0 and annual_current_debt[-1]:
 else:
 
     # gives only an approximation
-    short_term_debt = inv.Equity(symbol).balance_sheet().current_debt_and_capital_lease_obligation()[0]
+    short_term_debt = equity.balance_sheet().current_debt_and_capital_lease_obligation()[0]
     logger.warning("Short term debt value may not be very accurate")
 
 ## cash flow
@@ -208,7 +211,7 @@ elif 'capitalExpenditures' in cash_flow[1]:
     capital_expenditures = cash_flow[1]['capitalExpenditures']['raw']
 else:
     capital_expenditures = None
-    logger.notice("Capital expenditures value could not be found")
+    logger.warning("Capital expenditures value could not be found")
 
 if 'depreciation' in cash_flow[0]:
     depreciation = cash_flow[0]['depreciation']['raw']
@@ -216,7 +219,7 @@ elif 'depreciation' in cash_flow[1]:
     depreciation = cash_flow[1]['depreciation']['raw']
 else:
     depreciation = None
-    logger.notice("Depreciation value could not be found")
+    logger.warning("Depreciation value could not be found")
 
 buffet_approved = 0
 buffet_criterias = 0
@@ -228,10 +231,16 @@ slater_criterias = 0
 slater_approved_summary = ''
 slater_not_approved_summary = ''
 
+mayer_approved = 0
+mayer_criterias = 0
+mayer_approved_summary = ''
+mayer_not_approved_summary = ''
+
 print('\n' + tr('Fundamental analysis of') + ' {} :\n'.format(company_name))
 
 # predict next year earnings using linear regression
 l = len(income_statements)
+print(income_statements)
 n = int(np.floor(np.divide(l, 3)))
 m = len(income_statements) - (n * 2)
 
@@ -287,6 +296,15 @@ if market_cap:
     else:
         slater_not_approved_summary += '\n-' + tr('Slater prefers smallcaps')
 
+    mayer_criterias += 1
+    price_to_sales_ratio = equity.ratios().price_to_sales_ttm()
+    if (market_cap > 300e6 and market_cap < 700e6) and (revenue > 140e6 and revenue < 200e6) \
+        and (price_to_sales_ratio > 2.5 and price_to_sales_ratio < 3.5):
+        mayer_approved += 1
+        mayer_approved_summary += "\n-" + tr("Mayer may consider this company as a potential 100-bagger provided it has and international expansion potential")
+    else:
+        mayer_not_approved_summary += "\n-" + tr("Mayer may not consider this company as a potential 100-bagger")
+
 ## profitability
 print(tr('Profitability') + ':')
 
@@ -334,9 +352,20 @@ if short_term_debt and long_term_debt and market_cap:
     ebit_ev_multiple = ebit / enterprise_value
     print('EBIT/EV: {:.2f}x'.format(ebit_ev_multiple))
 
-# # eps
-# basic_eps = net_income_applicable_to_common_shares / common_shares
-# print('EPS: {}'.format(basic_eps))
+# eps
+if net_income_applicable_to_common_shares:
+    basic_eps = net_income_applicable_to_common_shares / common_shares_outstaning
+else:
+    basic_eps = net_income / common_shares_outstaning
+
+# pe ratio
+per = (market_cap / common_shares_outstaning) / basic_eps
+comment = tr("bad")
+if per <= 10:
+    comment = tr("excellent")
+elif per <= 12:
+    comment = tr("bon")
+print("P/E Ratio: {:.2f} -> {}".format(per, comment))
 
 ## management effectivness
 print('\n' + tr('Management effectivness') + ':')
@@ -553,3 +582,13 @@ else:
 print('\n' + tr('Recommendation') + ' {:.2f}/10'.format(slater_approved * 10 / slater_criterias))
 print(tr('Pros') + ': {}'.format(slater_approved_summary))
 print(tr('Cons') + ': {}'.format(slater_not_approved_summary))
+
+if mayer_approved / mayer_criterias > 0.5 and mayer_approved / mayer_criterias < 0.7:
+    print("\n" + tr("The stock value of") + " {} ".format(company_name) + tr("meets some of Chris Mayer\'s selection criteria"))
+elif mayer_approved / mayer_criterias > 0.7:
+    print("\n" + tr("The stock value of") + " {} ".format(company_name) + tr("meets most of Chris Mayer\'s selection criteria"))
+else:
+    print("\n" + tr("The stock value of") + " {} ".format(company_name) + tr("does not meet Chris Mayer\'s selection criteria"))
+print("\n" + tr('Recommendation') + " {:.2f}/10".format(mayer_approved * 10 / mayer_criterias))
+print(tr("Pros") + ": {}".format(mayer_approved_summary))
+print(tr("Cons") + ": {}".format(mayer_not_approved_summary))
