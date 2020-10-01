@@ -297,7 +297,7 @@ if market_cap:
         slater_not_approved_summary += '\n-' + tr('Slater prefers smallcaps')
 
     mayer_criterias += 1
-    price_to_sales_ratio = equity.ratios().price_to_sales_ttm()
+    price_to_sales_ratio = equity.ratios().price_to_sales_ttm()["Company"]
     if (market_cap > 300e6 and market_cap < 700e6) and (revenue > 140e6 and revenue < 200e6) \
         and (price_to_sales_ratio > 2.5 and price_to_sales_ratio < 3.5):
         mayer_approved += 1

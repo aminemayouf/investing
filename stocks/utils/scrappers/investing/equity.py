@@ -10,9 +10,15 @@ from .ratios import Ratios
 symbols = {
     "BIG":      "bigben-interactive",
     "BOI":      "boiron",
+    "COVH":     "fonciere-des-murs",
+    "HCO":      "highco",
+    "IPS":      "ipsos",
     "MSFT":     "microsoft-corp",
     "NACON":    "nacon-sa",
+    "NOKIA":    "nokia-finland",
+    "ORA":      "france-telecom",
     "KPSN":     "kinepolis-group",
+    "PHGN":   "pharco-d",
     "VMX":      "inside-secure-sa"
 }
 
