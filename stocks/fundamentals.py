@@ -43,7 +43,13 @@ net_income_applicable_to_common_shares = __safe_get(income_statement.income_avai
 gross_profit = __safe_get(income_statement.gross_profit(), 0)
 operating_income = __safe_get(income_statement.operating_income(), 0)
 net_income = __safe_get(income_statement.net_income(), 0)
-ebitda = net_income + __safe_get(income_statement.interest_income(), 0) + __safe_get(income_statement.provision_for_income_taxes(), 0) + __safe_get(income_statement.depreciation_amortization(), 0)
+interest_income = __safe_get(income_statement.interest_income(), 0)
+provision_for_income_taxes = __safe_get(income_statement.provision_for_income_taxes(), 0)
+depreciation_amortization = __safe_get(income_statement.depreciation_amortization(), 0)
+
+ebitda = None
+if net_income and interest_income and provision_for_income_taxes and depreciation_amortization:
+    ebitda = net_income + interest_income + provision_for_income_taxes + depreciation_amortization
 
 # balance sheet
 balance_sheet = equity.balance_sheet

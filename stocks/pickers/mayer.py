@@ -26,7 +26,7 @@ class Mayer:
         # ratios
         ratios = self.equity.ratios
 
-        price_to_sales_ratio = self.__safe_get(ratios.price_to_sales_ttm(), 0)
+        price_to_sales_ratio = float(self.__safe_get(ratios.price_to_sales_ttm(), 0))
 
         ## market cap
         market_cap = self.equity.market_cap()

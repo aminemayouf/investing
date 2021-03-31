@@ -13,8 +13,4 @@ class Ratios:
         return self.data.loc[label]
 
     def price_to_sales_ttm(self):
-        try:
-            price_to_sales = float(self.__extract("Price to Sales TTM")[0])
-            return price_to_sales
-        except ValueError:
-            return None
+        return self.__extract("Price to Sales TTM")

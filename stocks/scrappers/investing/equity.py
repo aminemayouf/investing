@@ -68,7 +68,10 @@ class Equity:
         # rename colums
         for i in range(1, len(table.columns)):
             column_name = table.columns[i]
-            table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
+            if column_name.startswith("Unnamed"):
+                table = table.drop(columns=[column_name])
+            else:
+                table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
         # use first column values as index
         table.index = table.iloc[:, 0]
         table.index.name = ""
@@ -94,7 +97,10 @@ class Equity:
         # rename colums
         for i in range(1, len(table.columns)):
             column_name = table.columns[i]
-            table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
+            if column_name.startswith("Unnamed"):
+                table = table.drop(columns=[column_name])
+            else:
+                table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
         # use first column values as index
         table.index = table.iloc[:, 0]
         table.index.name = ""
@@ -120,7 +126,10 @@ class Equity:
         # rename colums
         for i in range(1, len(table.columns)):
             column_name = table.columns[i][0]
-            table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
+            if column_name.startswith("Unnamed"):
+                table = table.drop(columns=[column_name])
+            else:
+                table = table.rename(columns={column_name: datetime.datetime.strptime(column_name, "%Y%d/%m").strftime("%d/%m/%Y")})
         # use first column values as index
         table.index = table.iloc[:, 0]
         table.index.name = ""
