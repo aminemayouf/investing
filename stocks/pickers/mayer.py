@@ -8,6 +8,12 @@ class Mayer:
     def __safe_get(self, value, index):
         return None if value is None else value[index]
 
+    def __safe_cast(self, value, to_type):
+        try:
+            return to_type(value)
+        except (ValueError, TypeError):
+            return None
+
     def evaluation(self):
         # get translator
         tr = Translator(config.language)
@@ -26,7 +32,8 @@ class Mayer:
         # ratios
         ratios = self.equity.ratios
 
-        price_to_sales_ratio = float(self.__safe_get(ratios.price_to_sales_ttm(), 0))
+        annual_price_to_sales_ttm = ratios.price_to_sales_ttm()
+        price_to_sales_ratio = self.__safe_cast(self.__safe_get(annual_price_to_sales_ttm, 0), float)
 
         ## market cap
         market_cap = self.equity.market_cap()
