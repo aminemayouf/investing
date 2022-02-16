@@ -1,8 +1,4 @@
 import argparse
-import json
-import os
-import urllib.request
-import requests
 import numpy as np
 from tabulate import tabulate
 import config
